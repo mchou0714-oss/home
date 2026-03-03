@@ -1,4 +1,4 @@
-# 📘 GitHub Markdown 筆記語法大全
+# 📘 GitHub Markdown 筆記語法
 > **用途**：彙整所有在 GitHub 製作專業 SOP 的常用語法，方便隨時複製使用。
 
 ---
