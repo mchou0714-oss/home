@@ -33,8 +33,7 @@
 
         /* Header */
         header {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)), 
-                        url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?ixlib=rb-4.0.3&auto=format&fit=cover&w=1200&q=80') no-repeat center center/cover;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1uBYfCVKfVph4XDazn_Af96zKc78CEUPg1PgkJIGSTqWjUPuPqU1NATXd&s=10') no-repeat center center/cover;
             height: 260px;
             display: flex;
             flex-direction: column;
@@ -74,7 +73,7 @@
             padding: 15px;
             box-shadow: var(--card-shadow);
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             text-align: center;
             margin-bottom: 25px;
@@ -108,7 +107,7 @@
 
         .day-btn {
             flex: 1;
-            min-width: 85px;
+            min-width: 75px;
             padding: 10px 5px;
             background: white;
             border: none;
@@ -259,15 +258,33 @@
             padding: 10px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
             height: 42px;
+            background: white;
         }
 
         .expense-form input[type="text"] { flex: 2; }
         .expense-form input[type="number"] { flex: 1; }
 
-        .expense-form button {
+        /* 複選按鈕觸發器 */
+        .payer-select-btn {
+            flex: 1;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 10px;
+            height: 42px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #636e72;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .expense-form button.add-btn {
             background-color: var(--green-accent);
             color: white;
             border: none;
@@ -292,6 +309,21 @@
             padding: 10px 5px;
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.9rem;
+        }
+
+        .expense-item .item-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payer-tag {
+            background: #e17055;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
         .expense-item .item-name { color: var(--dark-text); }
@@ -321,7 +353,31 @@
             padding-top: 10px;
         }
 
-        /* 資訊卡片樣式 (用於航班/住宿與行前準備) */
+        /* 彈跳視窗 (複選付款人) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .modal-content h3 { font-size: 1.1rem; margin-bottom: 12px; color: var(--dark-text); }
+        .modal-checkboxes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .modal-checkboxes label { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; cursor: pointer; }
+        .modal-btn {
+            width: 100%; background: var(--sub-blue); color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+
+        /* 資訊卡片樣式 */
         .info-section-card {
             background: white;
             border-radius: 15px;
@@ -348,16 +404,8 @@
             font-size: 0.95rem;
         }
 
-        .info-row span:first-child {
-            color: #636e72;
-            font-weight: 500;
-        }
-
-        .info-row span:last-child {
-            font-weight: bold;
-            color: var(--dark-text);
-            text-align: right;
-        }
+        .info-row span:first-child { color: #636e72; font-weight: 500; }
+        .info-row span:last-child { font-weight: bold; color: var(--dark-text); text-align: right; }
 
         /* 手機版 RWD 調整 */
         @media (max-width: 600px) {
@@ -370,8 +418,9 @@
                 gap: 8px;
             }
             .expense-form input[type="text"] { grid-column: span 2; width: 100%; }
+            .payer-select-btn { grid-column: span 1; width: 100%; }
             .expense-form input[type="number"] { grid-column: span 1; width: 100%; }
-            .expense-form button { grid-column: span 1; width: 100%; }
+            .expense-form button.add-btn { grid-column: span 2; width: 100%; }
         }
 
         .todo-grid {
@@ -414,7 +463,7 @@
 
     <!-- 頂部橫幅 -->
     <header>
-        <h1>東京五天四夜秋季之旅 🗼</h1>
+        <h1>東京五天四夜之旅</h1>
         <p>2025.09.08 (二) - 09.12 (六)</p>
     </header>
 
@@ -431,37 +480,21 @@
                 <p>9 月 12 日 (六)</p>
             </div>
             <div class="info-card">
-                <h4>交通工具</h4>
-                <p>Access 特快 / 地鐵</p>
-            </div>
-            <div class="info-card">
                 <h4>住宿地點</h4>
-                <p>淺草周邊飯店</p>
-            </div>
-        </div>
-
-        <!-- 財務總覽與匯率換算卡片 -->
-        <div class="bookkeeping-box" style="background: white; margin-bottom: 25px; border-color: var(--primary-red);">
-            <h4 style="color: var(--primary-red);">📊 旅程總花費與即時換算</h4>
-            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 8px;">
-                五天總花費：<span id="grand-total" style="color: var(--primary-red);">¥0</span> 
-                <span style="font-size: 0.9rem; color: #636e72; font-weight: normal;">(約 NT$ <span id="twd-total">0</span>)</span>
-            </p>
-            <div style="font-size: 0.85rem; color: #636e72;">
-                💡 匯率換算設定： 
-                <input type="number" id="exchange-rate" value="0.22" step="0.01" style="width: 70px; padding: 2px 5px; border: 1px solid #cbd5e1; border-radius: 5px;" oninput="updateGrandTotal()">
+                <p>MIMARU 淺草 STATION</p>
             </div>
         </div>
 
         <!-- 分頁切換按鈕 -->
         <div class="day-nav">
-            <button class="day-btn active" onclick="switchTab('prep')" style="background: #e1b12c; color: white;">🎒 行前準備</button>
-            <button class="day-btn" onclick="switchTab('flight')" style="background: #0984e3; color: white;">✈️ 航班住宿</button>
+            <button class="day-btn active" onclick="switchTab('prep')" style="background: #e1b12c; color: white;">行前準備</button>
+            <button class="day-btn" onclick="switchTab('flight')" style="background: #0984e3; color: white;">航班資訊</button>
             <button class="day-btn" onclick="switchTab(1)">Day 1</button>
             <button class="day-btn" onclick="switchTab(2)">Day 2</button>
             <button class="day-btn" onclick="switchTab(3)">Day 3</button>
             <button class="day-btn" onclick="switchTab(4)">Day 4</button>
             <button class="day-btn" onclick="switchTab(5)">Day 5</button>
+            <button class="day-btn" onclick="switchTab('summary')" style="background: var(--primary-red); color: white;">📊 結算</button>
         </div>
 
         <!-- 1. 行前準備與行李清單分頁 -->
@@ -494,299 +527,186 @@
         <!-- 2. 航班與住宿資訊分頁 -->
         <div id="flight-panel" class="day-section">
             <div class="info-section-card">
-                <h3>✈️ 去程航班資訊</h3>
-                <div class="info-row"><span>日期</span><span>2025 年 9 月 8 日 (二)</span></div>
-                <div class="info-row"><span>航空公司 / 航班</span><span>長榮航空 BR198 (範例)</span></div>
-                <div class="info-row"><span>起飛 / 抵達</span><span>08:50 桃園機場 (T2) ➔ 13:00 成田機場 (T1)</span></div>
-            </div>
-
-            <div class="info-section-card">
-                <h3>✈️ 回程航班資訊</h3>
-                <div class="info-row"><span>日期</span><span>2025 年 9 月 12 日 (六)</span></div>
-                <div class="info-row"><span>航空公司 / 航班</span><span>長榮航空 BR197 (範例)</span></div>
-                <div class="info-row"><span>起飛 / 抵達</span><span>14:15 成田機場 (T1) ➔ 17:00 桃園機場 (T2)</span></div>
+                <h3>✈️ 台北東京來回機票</h3>
+                <div class="info-row"><span>去回程航線</span><span>桃園機場 ⇄ 東京成田機場</span></div>
+                <div class="info-row" style="color: var(--primary-red);"><span>機票總費用</span><span>NT$ 49,640 (付款人：媽媽)</span></div>
             </div>
 
             <div class="info-section-card" style="border-left-color: var(--primary-red);">
                 <h3>🏨 飯店住宿資訊 (可搭計程車出示日文地址)</h3>
-                <div class="info-row"><span>飯店名稱</span><span>東京淺草藝宿飯店 (範例)</span></div>
-                <div class="info-row"><span>英文地址</span><span>1-1-1 Asakusa, Taito City, Tokyo</span></div>
+                <div class="info-row"><span>飯店名稱</span><span>MIMARU東京淺草STATION</span></div>
+                <div class="info-row"><span>英文地址</span><span>1-11-2 Hanakawado, Taito City, Tokyo</span></div>
                 <div class="info-row" style="background: #fff5f5; padding: 10px; border-radius: 6px; margin-top: 5px;">
                     <span style="color: var(--primary-red);">🇯🇵 日文地址 (搭車用)</span>
-                    <span style="color: var(--primary-red); font-size: 1.05rem;">東京都台東区浅草 1-1-1</span>
+                    <span style="color: var(--primary-red); font-size: 1.05rem;">東京都台東区花川戸1-11-2</span>
                 </div>
-                <div class="info-row"><span>飯店電話</span><span>+81 3-1234-5678</span></div>
                 <div class="info-row"><span>入住 / 退房</span><span>09/08 下午 15:00 後 ➔ 09/12 上午 11:00 前</span></div>
+                <div class="info-row" style="color: var(--primary-red);"><span>住宿總費用</span><span>NT$ 31,559 (付款人：爸爸)</span></div>
             </div>
         </div>
 
-        <!-- Day 1 行程 -->
+        <!-- Day 1 -->
         <div id="day1-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 1 - 淺草雷門與晴空塔夜景</span>
-                <span class="day-date">9/8 (二)</span>
-            </div>
+            <div class="day-title"><span>Day 1 - 淺草雷門與晴空塔夜景</span><span class="day-date">9/8 (二)</span></div>
             <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午 (航班抵達)</div>
-                    <div class="timeline-content">
-                        <h3>抵達成田機場 ✈️</h3>
-                        <p>搭乘「京成電鐵 Access 特快」直達淺草站。前往飯店辦理 Check-in 並寄放行李。</p>
-                        <a href="https://maps.google.com/?q=Narita+Airport" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">傍晚</div>
-                    <div class="timeline-content">
-                        <h3>淺草雷門 & 仲見世通 🏮</h3>
-                        <p>漫步經典雷門，品嚐「炸牛元村」與傳統人形燒。</p>
-                        <span class="tag">必吃：炸牛元村</span>
-                        <br><a href="https://maps.google.com/?q=Senso-ji+Kaminarimon" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上</div>
-                    <div class="timeline-content">
-                        <h3>東京晴空塔 (Skytree) 🗼</h3>
-                        <p>步行或搭地鐵前往晴空塔，逛塔下商場、享用晚餐，並登上展望台俯瞰東京絕美夜景與夕陽。</p>
-                        <a href="https://maps.google.com/?q=Tokyo+Skytree" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">下午</div><div class="timeline-content"><h3>抵達成田機場 ✈️</h3><p>搭乘 Access 特快直達淺草站並 Check-in。</p><a href="https://maps.google.com/?q=Narita+Airport" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">傍晚</div><div class="timeline-content"><h3>淺草雷門 & 晴空塔 🏮</h3><p>漫步雷門、品嚐炸牛元村，晚上登晴空塔看夜景。</p><a href="https://maps.google.com/?q=Tokyo+Skytree" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
             </div>
-
-            <!-- Day 1 記帳欄位 -->
             <div class="bookkeeping-box">
                 <h4>💰 Day 1 記帳 (日幣 JPY)</h4>
                 <div class="expense-form">
-                    <input type="text" id="input-item-1" placeholder="品項 (如: 拉麵)" onkeypress="checkEnter(event, 1)" required>
+                    <input type="text" id="input-item-1" placeholder="品項 (如: 拉麵)" required>
+                    <button type="button" class="payer-select-btn" onclick="openPayerModal(1)">
+                        <span id="payer-label-1">誰付的？</span> 🔽
+                    </button>
                     <input type="number" id="input-amount-1" placeholder="金額" inputmode="numeric" onkeypress="checkEnter(event, 1)" required>
-                    <button onclick="addExpense(1)">新增</button>
+                    <button class="add-btn" onclick="addExpense(1)">新增</button>
                 </div>
                 <ul class="expense-list" id="list-1"></ul>
-                <div class="expense-summary">
-                    今日消費：<span id="total-1">¥0</span>
-                </div>
+                <div class="expense-summary">今日消費：<span id="total-1">¥0</span></div>
             </div>
         </div>
 
-        <!-- Day 2 行程 -->
+        <!-- Day 2 -->
         <div id="day2-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 2 - 森林、祈願與台場鋼彈</span>
-                <span class="day-date">9/9 (三)</span>
-            </div>
+            <div class="day-title"><span>Day 2 - 森林、祈願與台場鋼彈</span><span class="day-date">9/9 (三)</span></div>
             <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午 09:30</div>
-                    <div class="timeline-content">
-                        <h3>明治神宮 🌲</h3>
-                        <p>搭乘地鐵銀座線至表參道站，漫步於神宮的參天大樹中，享受市區內難得的森林芬多精。</p>
-                        <a href="https://maps.google.com/?q=Meiji+Jingu" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">中午 12:00</div>
-                    <div class="timeline-content">
-                        <h3>表參道散策 ☕</h3>
-                        <p>逛逛充滿設計感的精品建築與特色咖啡廳。</p>
-                        <a href="https://maps.google.com/?q=Omotesando" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午 14:30</div>
-                    <div class="timeline-content">
-                        <h3>福德神社 & 銀座 ⛩️🛍️</h3>
-                        <p>搭地鐵至「三越前站」前往福德神社，祈求財運與中獎！隨後散步至鄰近的銀座。</p>
-                        <span class="tag">祈願：財運、中獎！</span>
-                        <br><a href="https://maps.google.com/?q=Fukutoku+Shrine" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上 18:00</div>
-                    <div class="timeline-content">
-                        <h3>台場夜景 & 巨大鋼彈 🤖</h3>
-                        <p>朝聖巨大獨角獸鋼彈、自由女神像，並欣賞彩虹大橋的夜景。</p>
-                        <a href="https://maps.google.com/?q=Unicorn+Gundam+Statue+Odaiba" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">上午</div><div class="timeline-content"><h3>明治神宮與表參道 🌲</h3><p>享受芬多精與逛特色咖啡廳。</p><a href="https://maps.google.com/?q=Meiji+Jingu" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">下午</div><div class="timeline-content"><h3>福德神社、銀座與台場鋼彈 🤖</h3><p>祈求財運並朝聖巨大鋼彈夜景。</p><a href="https://maps.google.com/?q=Unicorn+Gundam+Statue+Odaiba" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
             </div>
-
-            <!-- Day 2 記帳欄位 -->
             <div class="bookkeeping-box">
                 <h4>💰 Day 2 記帳 (日幣 JPY)</h4>
                 <div class="expense-form">
-                    <input type="text" id="input-item-2" placeholder="品項 (如: 藥妝)" onkeypress="checkEnter(event, 2)" required>
+                    <input type="text" id="input-item-2" placeholder="品項 (如: 藥妝)" required>
+                    <button type="button" class="payer-select-btn" onclick="openPayerModal(2)">
+                        <span id="payer-label-2">誰付的？</span> 🔽
+                    </button>
                     <input type="number" id="input-amount-2" placeholder="金額" inputmode="numeric" onkeypress="checkEnter(event, 2)" required>
-                    <button onclick="addExpense(2)">新增</button>
+                    <button class="add-btn" onclick="addExpense(2)">新增</button>
                 </div>
                 <ul class="expense-list" id="list-2"></ul>
-                <div class="expense-summary">
-                    今日消費：<span id="total-2">¥0</span>
-                </div>
+                <div class="expense-summary">今日消費：<span id="total-2">¥0</span></div>
             </div>
         </div>
 
-        <!-- Day 3 行程 -->
+        <!-- Day 3 -->
         <div id="day3-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 3 - 海鮮美食、潮流澀谷與鐵塔</span>
-                <span class="day-date">9/10 (四)</span>
-            </div>
+            <div class="day-title"><span>Day 3 - 海鮮美食與澀谷天空</span><span class="day-date">9/10 (四)</span></div>
             <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午 08:30</div>
-                    <div class="timeline-content">
-                        <h3>築地場外市場 🍣</h3>
-                        <p>大口品嚐海鮮丼、現烤玉子燒與烤牛舌。</p>
-                        <span class="tag">週四全面營業！</span>
-                        <br><a href="https://maps.google.com/?q=Tsukiji+Outer+Market" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午 13:00</div>
-                    <div class="timeline-content">
-                        <h3>澀谷探索 & SHIBUYA SKY 🌇</h3>
-                        <p>體驗震撼的澀谷十字路口。傍晚登上 SHIBUYA SKY，眺望夕陽與富士山。</p>
-                        <span class="tag">需提前預約展望台</span>
-                        <br><a href="https://maps.google.com/?q=SHIBUYA+SKY" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上 19:30</div>
-                    <div class="timeline-content">
-                        <h3>東京鐵塔 🗼</h3>
-                        <p>尋找最佳角度，拍下最經典的紅白東京鐵塔夜景。</p>
-                        <a href="https://maps.google.com/?q=Tokyo+Tower" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">上午</div><div class="timeline-content"><h3>築地市場 & SHIBUYA SKY 🍣</h3><p>品嚐海鮮丼並登上展望台看富士山。</p><a href="https://maps.google.com/?q=SHIBUYA+SKY" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
             </div>
-
-            <!-- Day 3 記帳欄位 -->
             <div class="bookkeeping-box">
                 <h4>💰 Day 3 記帳 (日幣 JPY)</h4>
                 <div class="expense-form">
-                    <input type="text" id="input-item-3" placeholder="品項 (如: 門票)" onkeypress="checkEnter(event, 3)" required>
+                    <input type="text" id="input-item-3" placeholder="品項 (如: 門票)" required>
+                    <button type="button" class="payer-select-btn" onclick="openPayerModal(3)">
+                        <span id="payer-label-3">誰付的？</span> 🔽
+                    </button>
                     <input type="number" id="input-amount-3" placeholder="金額" inputmode="numeric" onkeypress="checkEnter(event, 3)" required>
-                    <button onclick="addExpense(3)">新增</button>
+                    <button class="add-btn" onclick="addExpense(3)">新增</button>
                 </div>
                 <ul class="expense-list" id="list-3"></ul>
-                <div class="expense-summary">
-                    今日消費：<span id="total-3">¥0</span>
-                </div>
+                <div class="expense-summary">今日消費：<span id="total-3">¥0</span></div>
             </div>
         </div>
 
-        <!-- Day 4 行程 -->
+        <!-- Day 4 -->
         <div id="day4-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 4 - 宅文化與超級不夜城</span>
-                <span class="day-date">9/11 (五)</span>
-            </div>
+            <div class="day-title"><span>Day 4 - 宅文化與新宿夜生活</span><span class="day-date">9/11 (五)</span></div>
             <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午 10:00</div>
-                    <div class="timeline-content">
-                        <h3>池袋太陽城 (Sunshine City) 👾</h3>
-                        <p>逛全日本最大的寶可夢中心 (Pokémon Center)，採購限定商品。</p>
-                        <a href="https://maps.google.com/?q=Sunshine+City+Ikebukuro" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午 14:00</div>
-                    <div class="timeline-content">
-                        <h3>秋葉原電器街 🎮</h3>
-                        <p>動漫宅基地！大逛萬代、駿河屋等公仔店。</p>
-                        <a href="https://maps.google.com/?q=Akihabara" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上 18:30</div>
-                    <div class="timeline-content">
-                        <h3>新宿 3D 貓咪 & 歌舞伎町 🐱🍻</h3>
-                        <p>前往新宿看裸視 3D 巨大貓咪，體驗道地居酒屋宵夜。</p>
-                        <a href="https://maps.google.com/?q=Shinjuku+East+Exit+Studio" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">全天</div><div class="timeline-content"><h3>池袋、秋葉原與新宿 👾</h3><p>寶可夢中心、秋葉原動漫街與新宿 3D 貓咪。</p><a href="https://maps.google.com/?q=Akihabara" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
             </div>
-
-            <!-- Day 4 記帳欄位 -->
             <div class="bookkeeping-box">
                 <h4>💰 Day 4 記帳 (日幣 JPY)</h4>
                 <div class="expense-form">
-                    <input type="text" id="input-item-4" placeholder="品項" onkeypress="checkEnter(event, 4)" required>
+                    <input type="text" id="input-item-4" placeholder="品項" required>
+                    <button type="button" class="payer-select-btn" onclick="openPayerModal(4)">
+                        <span id="payer-label-4">誰付的？</span> 🔽
+                    </button>
                     <input type="number" id="input-amount-4" placeholder="金額" inputmode="numeric" onkeypress="checkEnter(event, 4)" required>
-                    <button onclick="addExpense(4)">新增</button>
+                    <button class="add-btn" onclick="addExpense(4)">新增</button>
                 </div>
                 <ul class="expense-list" id="list-4"></ul>
-                <div class="expense-summary">
-                    今日消費：<span id="total-4">¥0</span>
-                </div>
+                <div class="expense-summary">今日消費：<span id="total-4">¥0</span></div>
             </div>
         </div>
 
-        <!-- Day 5 行程 -->
+        <!-- Day 5 -->
         <div id="day5-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 5 - 淺草空景與回程</span>
-                <span class="day-date">9/12 (六)</span>
-            </div>
+            <div class="day-title"><span>Day 5 - 晨間空景與回程</span><span class="day-date">9/12 (六)</span></div>
             <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午 07:45</div>
-                    <div class="timeline-content">
-                        <h3>淺草雷門 (晨間空景) 📸</h3>
-                        <p>避開遊客潮，拍下超乾淨的無人空景。隨後回飯店退房並寄放行李。</p>
-                        <a href="https://maps.google.com/?q=Senso-ji" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">中午 12:00</div>
-                    <div class="timeline-content">
-                        <h3>淺草最後採買 🛍️</h3>
-                        <p>在周邊進行藥妝與伴手禮的最後大掃貨。</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午 15:30</div>
-                    <div class="timeline-content">
-                        <h3>前往成田機場 ✈️</h3>
-                        <p>搭乘 Access 特快直達成田機場，搭乘 19:30 班機回台灣。</p>
-                        <a href="https://maps.google.com/?q=Asakusa+Station" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
+                <div class="timeline-item"><div class="timeline-marker"></div><div class="timeline-time">上午</div><div class="timeline-content"><h3>淺草雷門空景與採買 📸</h3><p>拍無人空景、最後掃貨後前往機場搭機返台。</p><a href="https://maps.google.com/?q=Asakusa+Station" target="_blank" class="map-link">📍 Google 地圖導航</a></div></div>
             </div>
-
-            <!-- Day 5 記帳欄位 -->
             <div class="bookkeeping-box">
                 <h4>💰 Day 5 記帳 (日幣 JPY)</h4>
                 <div class="expense-form">
                     <input type="text" id="input-item-5" placeholder="品項" required>
+                    <button type="button" class="payer-select-btn" onclick="openPayerModal(5)">
+                        <span id="payer-label-5">誰付的？</span> 🔽
+                    </button>
                     <input type="number" id="input-amount-5" placeholder="金額" inputmode="numeric" required>
-                    <button onclick="addExpense(5)">新增</button>
+                    <button class="add-btn" onclick="addExpense(5)">新增</button>
                 </div>
                 <ul class="expense-list" id="list-5"></ul>
-                <div class="expense-summary">
-                    今日消費：<span id="total-5">¥0</span>
+                <div class="expense-summary">今日消費：<span id="total-5">¥0</span></div>
+            </div>
+        </div>
+
+        <!-- 3. 財務總覽與分帳結算分頁 -->
+        <div id="summary-panel" class="day-section">
+            <div class="info-section-card" style="border-left-color: var(--primary-red);">
+                <h3>📊 全家總花費結算儀表板</h3>
+                
+                <div class="info-row">
+                    <span>機票總費用 (台幣)</span>
+                    <span>NT$ 49,640 (媽媽付)</span>
+                </div>
+                <div class="info-row">
+                    <span>住宿總費用 (台幣)</span>
+                    <span>NT$ 31,559 (爸爸付)</span>
+                </div>
+                <div class="info-row">
+                    <span>日本現地總花費 (日幣)</span>
+                    <span id="summary-jpy">¥0</span>
+                </div>
+                <div class="info-row">
+                    <span>日本現地總花費 (折合台幣)</span>
+                    <span id="summary-twd">NT$ 0</span>
+                </div>
+                <div class="info-row" style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 1.1rem;">
+                    <span style="color: var(--primary-red); font-weight: bold;">💎 旅程全家總開銷 (機+酒+現地)</span>
+                    <span id="summary-grand-total" style="color: var(--primary-red);">NT$ 0</span>
+                </div>
+
+                <div style="margin-top: 15px; font-size: 0.85rem; color: #636e72;">
+                    💡 目前計算匯率設定： 
+                    <input type="number" id="exchange-rate" value="0.22" step="0.01" style="width: 70px; padding: 2px 5px; border: 1px solid #cbd5e1; border-radius: 5px;" oninput="updateGrandTotal()">
+                </div>
+            </div>
+
+            <div class="info-section-card" style="border-left-color: var(--green-accent);">
+                <h3>👥 個人墊付/花費統計 (日幣 JPY)</h3>
+                <div id="individual-expense-list">
+                    <!-- 動態產生成員個人花費 -->
                 </div>
             </div>
         </div>
 
+    </div>
+
+    <!-- 複選付款人彈跳視窗 -->
+    <div id="payer-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>選擇付款人 (可複選)</h3>
+            <div class="modal-checkboxes">
+                <label><input type="checkbox" name="modal-payer" value="孟"> 孟</label>
+                <label><input type="checkbox" name="modal-payer" value="爸"> 爸</label>
+                <label><input type="checkbox" name="modal-payer" value="媽"> 媽</label>
+                <label><input type="checkbox" name="modal-payer" value="安"> 安</label>
+                <label><input type="checkbox" name="modal-payer" value="公費"> 公費</label>
+            </div>
+            <button class="modal-btn" onclick="confirmPayerSelection()">確定</button>
+        </div>
     </div>
 
     <footer>
@@ -795,7 +715,28 @@
 
     <!-- JavaScript 邏輯 -->
     <script>
-        // 分頁切換功能 ('prep', 'flight', 1~5)
+        let currentModalDay = null;
+
+        function openPayerModal(dayNum) {
+            currentModalDay = dayNum;
+            document.querySelectorAll('input[name="modal-payer"]').forEach(cb => cb.checked = false);
+            document.getElementById('payer-modal').style.display = 'flex';
+        }
+
+        function confirmPayerSelection() {
+            const checkedBoxes = document.querySelectorAll('input[name="modal-payer"]:checked');
+            if (checkedBoxes.length === 0) {
+                alert("請至少選擇一位付款人！");
+                return;
+            }
+            const selectedPayers = Array.from(checkedBoxes).map(cb => cb.value);
+            const payerString = selectedPayers.join(', ');
+            
+            document.getElementById(`payer-label-${currentModalDay}`).innerText = payerString;
+            document.getElementById(`payer-label-${currentModalDay}`).style.color = '#2d3436';
+            document.getElementById('payer-modal').style.display = 'none';
+        }
+
         function switchTab(tabTarget) {
             document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.day-section').forEach(section => section.classList.remove('active'));
@@ -808,13 +749,16 @@
             } else if (tabTarget === 'flight') {
                 buttons[1].classList.add('active');
                 document.getElementById('flight-panel').classList.add('active');
+            } else if (tabTarget === 'summary') {
+                buttons[6].classList.add('active');
+                document.getElementById('summary-panel').classList.add('active');
+                updateGrandTotal();
             } else {
-                buttons[tabTarget + 1].classList.add('active'); // Day 1 是索引 2
+                buttons[tabTarget + 1].classList.add('active');
                 document.getElementById(`day${tabTarget}-panel`).classList.add('active');
             }
         }
 
-        // 記帳邏輯 (LocalStorage)
         let tripExpenses = JSON.parse(localStorage.getItem('tokyo_trip_expenses')) || {
             day1: [],
             day2: [],
@@ -838,10 +782,17 @@
 
         function addExpense(dayNum) {
             const itemInput = document.getElementById(`input-item-${dayNum}`);
+            const payerLabel = document.getElementById(`payer-label-${dayNum}`);
             const amountInput = document.getElementById(`input-amount-${dayNum}`);
             
             const itemName = itemInput.value.trim();
+            const payerName = payerLabel.innerText;
             const amountValue = parseInt(amountInput.value);
+
+            if (payerName === "誰付的？") {
+                alert("請選擇這筆花費是誰付的喔！");
+                return;
+            }
 
             if (itemName === "" || isNaN(amountValue) || amountValue <= 0) {
                 alert("請填寫正確的品項與金額喔！");
@@ -851,6 +802,7 @@
             const newRecord = {
                 id: Date.now(),
                 name: itemName,
+                payer: payerName,
                 amount: amountValue
             };
 
@@ -860,6 +812,8 @@
 
             itemInput.value = "";
             amountInput.value = "";
+            payerLabel.innerText = "誰付的？";
+            payerLabel.style.color = "#636e72";
         }
 
         function editExpense(dayNum, id) {
@@ -870,17 +824,21 @@
             const newName = prompt("請修改品項名稱：", item.name);
             if (newName === null) return;
 
+            const newPayer = prompt("請修改付款人 (如: 孟, 媽 / 公費)：", item.payer);
+            if (newPayer === null) return;
+
             const newAmountStr = prompt("請修改金額 (JPY)：", item.amount);
             if (newAmountStr === null) return;
 
             const newAmount = parseInt(newAmountStr);
 
-            if (newName.trim() === "" || isNaN(newAmount) || newAmount <= 0) {
-                alert("修改失敗：請填寫有效的品項與金額！");
+            if (newName.trim() === "" || !newPayer.trim() || isNaN(newAmount) || newAmount <= 0) {
+                alert("修改失敗：請填寫有效的品項、付款人與金額！");
                 return;
             }
 
             item.name = newName.trim();
+            item.payer = newPayer.trim();
             item.amount = newAmount;
 
             saveToStorage();
@@ -905,8 +863,14 @@
                 total += item.amount;
                 const li = document.createElement('li');
                 li.className = 'expense-item';
+                
+                const payer = item.payer || "未指定";
+
                 li.innerHTML = `
-                    <span class="item-name">${item.name}</span>
+                    <div class="item-info">
+                        <span class="payer-tag">${payer}</span>
+                        <span class="item-name">${item.name}</span>
+                    </div>
                     <div style="display: flex; align-items: center;">
                         <span class="item-amount">¥${item.amount.toLocaleString()}</span>
                         <div class="action-btns">
@@ -923,25 +887,54 @@
         }
 
         function updateGrandTotal() {
-            let grandTotal = 0;
+            let grandTotalJPY = 0;
             const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.22;
+            
+            const memberTotals = { "孟": 0, "爸": 0, "媽": 0, "安": 0, "公費": 0 };
 
             for (let i = 1; i <= 5; i++) {
                 const dayData = tripExpenses[`day${i}`] || [];
                 dayData.forEach(item => {
-                    grandTotal += item.amount;
+                    grandTotalJPY += item.amount;
+
+                    const payers = item.payer.split(',').map(p => p.trim());
+                    const splitAmount = item.amount / payers.length;
+                    payers.forEach(p => {
+                        if (memberTotals[p] !== undefined) {
+                            memberTotals[p] += splitAmount;
+                        } else {
+                            memberTotals[p] = splitAmount;
+                        }
+                    });
                 });
             }
 
-            document.getElementById('grand-total').innerText = `¥${grandTotal.toLocaleString()}`;
-            document.getElementById('twd-total').innerText = Math.round(grandTotal * rate).toLocaleString();
+            document.getElementById('summary-jpy').innerText = `¥${grandTotalJPY.toLocaleString()}`;
+            const jpyToTwd = Math.round(grandTotalJPY * rate);
+            document.getElementById('summary-twd').innerText = `NT$ ${jpyToTwd.toLocaleString()}`;
+
+            const flightHotelTwd = 49640 + 31559;
+            const absoluteGrandTotal = flightHotelTwd + jpyToTwd;
+            document.getElementById('summary-grand-total').innerText = `NT$ ${absoluteGrandTotal.toLocaleString()}`;
+
+            const individualContainer = document.getElementById('individual-expense-list');
+            individualContainer.innerHTML = "";
+            for (const [member, amount] of Object.entries(memberTotals)) {
+                const twdEquivalent = Math.round(amount * rate);
+                const row = document.createElement('div');
+                row.className = 'info-row';
+                row.innerHTML = `
+                    <span>${member} 墊付/花費總計</span>
+                    <span>¥${Math.round(amount).toLocaleString()} <span style="font-weight: normal; color: #636e72;">(約 NT$ ${twdEquivalent.toLocaleString()})</span></span>
+                `;
+                individualContainer.appendChild(row);
+            }
         }
 
         function saveToStorage() {
             localStorage.setItem('tokyo_trip_expenses', JSON.stringify(tripExpenses));
         }
 
-        // 清單 LocalStorage 記憶 (支援多個 Checkbox)
         function saveTodoList() {
             const checkboxes = document.querySelectorAll('.todo-chk');
             const todoState = {};
