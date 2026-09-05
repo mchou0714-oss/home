@@ -513,6 +513,16 @@
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
+		.important-note {
+			color: #c62828;
+			font-weight: 800;
+			background: #fff0f0;
+			border: 1px solid #f5b5b5;
+			padding: 10px 14px;
+			border-radius: 10px;
+			display: inline-block;
+			margin-top: 10px;
+		}
     </style>
 </head>
 <body>
@@ -648,108 +658,264 @@
 			</div>
         </div>
 
-        <!-- Day 1 行程 -->
-        <div id="day1-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 1 - 抵達淺草、雷門與晴空塔夜景</span>
-                <span class="day-date">9/8 (二)</span>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午</div>
-                    <div class="timeline-content">
-                        <h3>抵達淺草 & 飯店寄放行李 ✈️🏨</h3>
-                        <p>班機抵達成田機場後，搭乘「京成電鐵 Access 特快」直達淺草站。先前往飯店辦理 Check-in 或寄放行李。</p>
-                        <a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">傍晚</div>
-                    <div class="timeline-content">
-                        <h3>淺草雷門 & 仲見世通 🏮</h3>
-                        <p>漫步經典雷門與熱鬧的仲見世通，品嚐傳統人形燒，並享用期待的炸牛元村！</p>
-                        <span class="tag">必吃：炸牛元村</span>
-                        <br><a href="https://maps.google.com/?q=Senso-ji+Kaminarimon" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上</div>
-                    <div class="timeline-content">
-                        <h3>東京晴空塔 (Skytree) 🗼</h3>
-                        <p>步行或搭地鐵前往晴空塔，逛逛塔下大型商場、享用晚餐，並登上展望台俯瞰東京絕美夕陽與夜景。</p>
-                        <a href="https://maps.google.com/?q=Tokyo+Skytree" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Day 1 記帳欄位 -->
-            <div class="bookkeeping-box">
-                <h4>💰 Day 1 記帳 (日幣 JPY)</h4>
-                <div class="expense-form">
-                    <input type="text" id="input-item-1" placeholder="品項" required>
-                    <button type="button" class="payer-select-btn" onclick="openPayerModal(1)">
+		<!-- Day 1 行程 -->
+		<div id="day1-panel" class="day-section">
+			<div class="day-title">
+				<span>Day 1 - 抵達淺草、雷門與晴空塔夜景</span>
+				<span class="day-date">9/8 (二)</span>
+			</div>
+		
+			<div class="timeline">
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">03:00</div>
+					<div class="timeline-content">
+						<h3>出發前往桃園機場 🚗</h3>
+						<p>準備出發前往桃園國際機場，開始東京五天四夜之旅！</p>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">06:35</div>
+					<div class="timeline-content">
+						<h3>桃園國際機場 ✈️</h3>
+						<p>搭乘台灣虎航前往日本成田國際機場。</p>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">11:00</div>
+					<div class="timeline-content">
+						<h3>抵達成田國際機場 🇯🇵</h3>
+						<p>抵達日本東京成田國際機場，準備前往淺草。</p>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">13:26</div>
+					<div class="timeline-content">
+						<h3>抵達淺草 🚇</h3>
+						<p>搭乘「京成電鐵 Access 特快」直達淺草站，抵達後步行前往飯店。</p>
+						<a href="https://maps.google.com/?q=Asakusa+Station" target="_blank" class="map-link">📍 淺草站導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">13:27</div>
+					<div class="timeline-content">
+						<h3>東京淺草站美滿如家飯店 🏨</h3>
+						<p>抵達飯店，先寄放行李，準備開始下午的淺草行程。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">13:41</div>
+					<div class="timeline-content">
+						<h3>鴨to蔥 淺草店 🍜</h3>
+						<p>抵達淺草後的第一餐，品嚐期待已久的鴨肉拉麵！</p>
+						<a href="https://maps.google.com/?q=Kamo+to+Negi+Asakusa" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">14:43</div>
+					<div class="timeline-content">
+						<h3>淺草寺・雷門 🏮</h3>
+						<p>漫步經典雷門與仲見世通，欣賞淺草寺的經典街景，並品嚐傳統人形燒。</p>
+						<a href="https://maps.google.com/?q=Senso-ji+Kaminarimon" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">16:27</div>
+					<div class="timeline-content">
+						<h3>東京晴空塔 🗼</h3>
+						<p>下午前往東京晴空塔，逛逛晴空塔城大型商場，並登上展望台欣賞東京夕陽與夜景。</p>
+						<a href="https://maps.google.com/?q=Tokyo+Skytree" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">19:32</div>
+					<div class="timeline-content">
+						<h3>角吉 東京晴空塔站前店 🍺</h3>
+						<p>結束晴空塔行程後，前往附近的角吉享用晚餐。</p>
+						<a href="https://maps.google.com/?q=角吉+東京晴空塔站前店" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">21:17</div>
+					<div class="timeline-content">
+						<h3>返回東京淺草站美滿如家飯店 🏨</h3>
+						<p>返回飯店休息，結束東京第一天行程。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+			</div>
+		
+			<!-- Day 1 記帳欄位 -->
+			<div class="bookkeeping-box">
+				<h4>💰 Day 1 記帳 (日幣 JPY)</h4>
+				<div class="expense-form">
+					<input type="text" id="input-item-1" placeholder="品項" required>
+					<button type="button" class="payer-select-btn" onclick="openPayerModal(1)">
 						<span id="payer-label-1">誰付的？</span> <span class="arrow-icon"></span>
 					</button>
-                    <input type="number" id="input-amount-1" placeholder="金額" inputmode="numeric" onkeypress="checkEnter(event, 1)" required>
-                    <button class="add-btn" onclick="addExpense(1)">新增</button>
-                </div>
-                <ul class="expense-list" id="list-1"></ul>
-                <div class="expense-summary">
-                    今日消費：<span id="total-1">¥0</span>
-                </div>
-            </div>
-        </div>
+					<input type="number" id="input-amount-1" placeholder="金額" inputmode="numeric" onkeypress="checkEnter(event, 1)" required>
+					<button class="add-btn" onclick="addExpense(1)">新增</button>
+				</div>
+				<ul class="expense-list" id="list-1"></ul>
+				<div class="expense-summary">
+					今日消費：<span id="total-1">¥0</span>
+				</div>
+			</div>
+		</div>
 
 
         <!-- Day 2 行程 -->
-        <div id="day2-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 2 - 森林、祈願、銀座與台場鋼彈</span>
-                <span class="day-date">9/9 (三)</span>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午</div>
-                    <div class="timeline-content">
-                        <h3>明治神宮 🌲</h3>
-                        <p>搭乘地鐵銀座線直達「表參道站」，漫步於神宮的參天大樹中，享受市區內難得的森林芬多精。</p>
-                        <span class="tag">✨避開築地公休</span>
-                        <br><a href="https://maps.google.com/?q=Meiji+Jingu" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">中午</div>
-                    <div class="timeline-content">
-                        <h3>表參道散策 & 福德神社 ⛩️☕</h3>
-                        <p>逛逛充滿設計感的精品建築與特色咖啡廳。隨後搭地鐵至「三越前站」，前往現代大樓中的福德神社祈求財運與中獎！</p>
-                        <span class="tag">祈願：財運、中獎！</span>
-                        <br><a href="https://maps.google.com/?q=Fukutoku+Shrine" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午</div>
-                    <div class="timeline-content">
-                        <h3>銀座精品散步 🛍️</h3>
-                        <p>散步到隔壁的【銀座】，感受頂級貴婦百貨與大型旗艦店的奢華購物氛圍。</p>
-                        <a href="https://maps.google.com/?q=Ginza+Tokyo" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上</div>
-                    <div class="timeline-content">
-                        <h3>台場夜景 & 巨大鋼彈 🤖</h3>
-                        <p>從新橋站轉乘「百合海鷗線」前往台場。朝聖巨大獨角獸鋼彈、自由女神像，並欣賞浪漫的彩虹大橋夜景。</p>
-                        <a href="https://maps.google.com/?q=Unicorn+Gundam+Statue+Odaiba" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-            </div>
+		<div id="day2-panel" class="day-section">
+			<div class="day-title">
+				<span>Day 2 - 森林、祈願、銀座與台場鋼彈</span>
+				<span class="day-date">9/9 (三)</span>
+			</div>
+		
+			<div class="timeline">
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">09:30</div>
+					<div class="timeline-content">
+						<h3>東京淺草站美滿如家飯店 🏨</h3>
+						<p>從飯店出發，準備開始今天的東京市區行程。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">10:07</div>
+					<div class="timeline-content">
+						<h3>Hachi Cafe Asagaya ☕</h3>
+						<p>前往阿佐谷，在特色咖啡廳享用早餐與咖啡，為今天的行程補充能量。</p>
+						<a href="https://maps.google.com/?q=Hachi+Cafe+Asagaya" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">11:14</div>
+					<div class="timeline-content">
+						<h3>阿佐谷神明宮 ⛩️</h3>
+						<p>前往阿佐谷神明宮參拜，欣賞神社境內的傳統建築與自然景色。</p>
+						<a href="https://maps.google.com/?q=阿佐谷神明宮" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">12:42</div>
+					<div class="timeline-content">
+						<h3>明治神宮・第一鳥居 🌲</h3>
+						<p>前往明治神宮，從第一鳥居進入，漫步於參天大樹之間，感受東京市區難得的森林氛圍。</p>
+						<a href="https://maps.google.com/?q=Meiji+Jingu+First+Torii" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">14:48</div>
+					<div class="timeline-content">
+						<h3>AFURI Harajuku 🍜</h3>
+						<p>在原宿享用午餐，品嚐 AFURI 招牌拉麵。</p>
+						<a href="https://maps.google.com/?q=AFURI+Harajuku" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">16:07</div>
+					<div class="timeline-content">
+						<h3>表參道散策 🛍️</h3>
+						<p>漫步表參道，逛逛街區中的特色店家與建築，享受悠閒的下午時光。</p>
+						<a href="https://maps.google.com/?q=Omotesando+Tokyo" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">17:23</div>
+					<div class="timeline-content">
+						<h3>西新宿 🚇</h3>
+						<p>前往西新宿，繼續晚上的新宿行程。</p>
+						<a href="https://maps.google.com/?q=Nishi-Shinjuku" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">17:28</div>
+					<div class="timeline-content">
+						<h3>大雄神宮 ⛩️</h3>
+						<p>前往神社參拜，感受新宿市區中的神社氛圍。</p>
+						<a href="https://maps.google.com/?q=大雄神宮+東京" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">18:13</div>
+					<div class="timeline-content">
+						<h3>新宿 🌃</h3>
+						<p>進入新宿街區，感受東京繁華的城市夜景與熱鬧氛圍。</p>
+						<a href="https://maps.google.com/?q=Shinjuku+Tokyo" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">18:55</div>
+					<div class="timeline-content">
+						<h3>牛舌の檸檬 🥩</h3>
+						<p>晚上享用期待已久的牛舌料理！</p>
+						<a href="https://maps.google.com/?q=牛たんの檸檬+新宿" target="_blank" class="map-link">📍 Google 地圖導航</a>
+						<p class="important-note">🚨 預約晚上 7：00，不能遲到！</p>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">20:20</div>
+					<div class="timeline-content">
+						<h3>新宿夜景 🌃</h3>
+						<p>吃完晚餐後繼續在新宿逛逛，感受東京不夜城的夜晚氣氛。</p>
+						<a href="https://maps.google.com/?q=Shinjuku+Tokyo" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">22:22</div>
+					<div class="timeline-content">
+						<h3>返回東京淺草站美滿如家飯店 🏨</h3>
+						<p>搭乘電車返回淺草，回飯店休息，結束第二天行程。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+			</div>
 
             <!-- Day 2 記帳欄位 -->
             <div class="bookkeeping-box">
@@ -769,43 +935,87 @@
             </div>
         </div>
 
-        <!-- Day 3 行程 -->
-        <div id="day3-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 3 - 築地海鮮、澀谷天空與東京鐵塔</span>
-                <span class="day-date">9/10 (四)</span>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午</div>
-                    <div class="timeline-content">
-                        <h3>築地場外市場 🍣</h3>
-                        <p>大口品嚐海鮮丼、現烤玉子燒與烤牛舌。（週四店家全面營業，建議 9:00 前抵達避開人潮）</p>
-                        <span class="tag">✨最佳築地時間</span>
-                        <br><a href="https://maps.google.com/?q=Tsukiji+Outer+Market" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午</div>
-                    <div class="timeline-content">
-                        <h3>澀谷探索 & SHIBUYA SKY 🌇</h3>
-                        <p>體驗震撼的澀谷十字路口、逛逛宮下公園。傍晚登上預約好的 SHIBUYA SKY 展望台，眺望夕陽與富士山。</p>
-                        <span class="tag">需提前預約展望台</span>
-                        <br><a href="https://maps.google.com/?q=SHIBUYA+SKY" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上</div>
-                    <div class="timeline-content">
-                        <h3>東京鐵塔 🗼</h3>
-                        <p>前往芝公園或麻布台之丘，尋找最佳角度，拍下最經典的紅白東京鐵塔夜景。</p>
-                        <a href="https://maps.google.com/?q=Tokyo+Tower" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-            </div>
+		<!-- Day 3 行程 -->
+		<div id="day3-panel" class="day-section">
+			<div class="day-title">
+				<span>Day 3 - 築地海鮮、台場與銀座</span>
+				<span class="day-date">9/10 (四)</span>
+			</div>
+		
+			<div class="timeline">
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">08:00</div>
+					<div class="timeline-content">
+						<h3>東京淺草站美滿如家飯店 🏨</h3>
+						<p>從飯店出發，前往今天第一站築地場外市場。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">08:30</div>
+					<div class="timeline-content">
+						<h3>築地場外市場 🍣</h3>
+						<p>早起前往築地場外市場，品嚐新鮮海鮮與各式市場美食。</p>
+						<span class="tag">✨早起吃海鮮</span>
+						<a href="https://maps.google.com/?q=Tsukiji+Outer+Market" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">11:00</div>
+					<div class="timeline-content">
+						<h3>台場 DiverCity Tokyo Plaza 🤖</h3>
+						<p>前往台場 DiverCity Tokyo Plaza，逛街購物並參觀著名的巨大獨角獸鋼彈。</p>
+						<span class="tag">必看：獨角獸鋼彈</span>
+						<a href="https://maps.google.com/?q=DiverCity+Tokyo+Plaza" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">12:30</div>
+					<div class="timeline-content">
+						<h3>銀座 🛍️</h3>
+						<p>前往銀座逛街購物，感受東京高級商圈的繁華氛圍。</p>
+						<a href="https://maps.google.com/?q=Ginza+Tokyo" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">15:00</div>
+					<div class="timeline-content">
+						<h3>返回東京淺草站美滿如家飯店 🏨</h3>
+						<p>結束白天行程後返回飯店休息，稍微整理與充電。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">17:00</div>
+					<div class="timeline-content">
+						<h3>出發享用晚餐 🍽️</h3>
+						<p>從飯店出發，前往晚餐地點享用晚餐。</p>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">17:30</div>
+					<div class="timeline-content">
+						<h3>返回東京淺草站美滿如家飯店 🏨</h3>
+						<p>晚餐結束後返回飯店休息，結束第三天行程。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+			</div>
 
             <!-- Day 3 記帳欄位 -->
             <div class="bookkeeping-box">
@@ -826,41 +1036,96 @@
         </div>
 
 
-        <!-- Day 4 行程 -->
-        <div id="day4-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 4 - 宅文化與超級不夜城</span>
-                <span class="day-date">9/11 (五)</span>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午</div>
-                    <div class="timeline-content">
-                        <h3>池袋太陽城 (Sunshine City) 👾</h3>
-                        <p>前往池袋太陽城，朝聖全日本最大的寶可夢中心 (Pokémon Center)，大肆採購限定商品。</p>
-                        <a href="https://maps.google.com/?q=Sunshine+City+Ikebukuro" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午</div>
-                    <div class="timeline-content">
-                        <h3>秋葉原電器街 🎮</h3>
-                        <p>搭地鐵直奔動漫跟電器聖地【秋葉原】！大逛萬代、駿河屋等知名公仔店，或體驗特色動漫文化。</p>
-                        <a href="https://maps.google.com/?q=Akihabara" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">晚上</div>
-                    <div class="timeline-content">
-                        <h3>新宿 3D 貓咪 & 歌舞伎町 🐱🍻</h3>
-                        <p>前往新宿東口觀賞超逼真的裸視 3D 巨型貓咪，晚上在充滿昭和風情的回憶橫丁或歌舞伎町享用道地居酒屋宵夜。</p>
-                        <a href="https://maps.google.com/?q=Shinjuku+East+Exit+Studio" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-            </div>
+		<!-- Day 4 行程 -->
+		<div id="day4-panel" class="day-section">
+			<div class="day-title">
+				<span>Day 4 - 秋葉原宅文化與澀谷天空</span>
+				<span class="day-date">9/11 (五)</span>
+			</div>
+		
+			<div class="timeline">
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">08:30</div>
+					<div class="timeline-content">
+						<h3>東京淺草站美滿如家飯店 🏨</h3>
+						<p>從飯店出發，前往秋葉原開始今天的宅文化探索行程。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">09:10</div>
+					<div class="timeline-content">
+						<h3>抵達秋葉原 🎮</h3>
+						<p>抵達動漫與電器文化聖地秋葉原，準備開始今天的探索。</p>
+						<a href="https://maps.google.com/?q=Akihabara+Station" target="_blank" class="map-link">📍 秋葉原站導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">09:30</div>
+					<div class="timeline-content">
+						<h3>CAFE OASIS 秋葉原店 ☕</h3>
+						<p>在咖啡廳享用早餐，稍微休息後再開始逛秋葉原。</p>
+						<a href="https://maps.google.com/?q=CAFE+OASIS+秋葉原店" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">10:30</div>
+					<div class="timeline-content">
+						<h3>秋葉原電器街 🎮🛍️</h3>
+						<p>大逛秋葉原動漫與電器街，探索萬代、駿河屋等店家，尋找喜歡的動漫周邊與限定商品。</p>
+						<a href="https://maps.google.com/?q=Akihabara" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">13:00</div>
+					<div class="timeline-content">
+						<h3>秋葉原午餐 🍜</h3>
+						<p>在秋葉原附近享用午餐，補充體力後繼續下午行程。</p>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">15:30</div>
+					<div class="timeline-content">
+						<h3>離開秋葉原 🚇</h3>
+						<p>結束秋葉原購物與探索，準備前往澀谷。</p>
+						<a href="https://maps.google.com/?q=Akihabara+Station" target="_blank" class="map-link">📍 秋葉原站導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">16:30</div>
+					<div class="timeline-content">
+						<h3>SHIBUYA SKY 🌇</h3>
+						<p>登上 SHIBUYA SKY 展望台，欣賞澀谷街景與東京夕陽，享受旅程中的城市高空景色。</p>
+						<span class="tag">需提前預約展望台</span>
+						<a href="https://maps.google.com/?q=SHIBUYA+SKY" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">20:00</div>
+					<div class="timeline-content">
+						<h3>返回東京淺草站美滿如家飯店 🏨</h3>
+						<p>結束今天的秋葉原與澀谷行程，搭乘電車返回淺草飯店休息。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+			</div>
 
             <!-- Day 4 記帳欄位 -->
             <div class="bookkeeping-box">
@@ -881,41 +1146,79 @@
         </div>
 
 
-        <!-- Day 5 行程 -->
-        <div id="day5-panel" class="day-section">
-            <div class="day-title">
-                <span>Day 5 - 晨間空景、最後採買與快樂回程</span>
-                <span class="day-date">9/12 (六)</span>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">上午</div>
-                    <div class="timeline-content">
-                        <h3>淺草雷門 (晨間空景) 📸</h3>
-                        <p>把握早上 8:00 前的黃金時間再次前往雷門，避開喧囂人潮，拍下超乾淨的無人絕美空景。隨後回飯店辦理退房並寄放行李。</p>
-                        <span class="tag">內行玩法：無人空景</span>
-                        <br><a href="https://maps.google.com/?q=Senso-ji" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">中午</div>
-                    <div class="timeline-content">
-                        <h3>最後採買 & 美食補齊 🛍️</h3>
-                        <p>在淺草周邊把尚未品嚐的美食補齊，進行藥妝與伴手禮的最後大掃貨！</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-time">下午</div>
-                    <div class="timeline-content">
-                        <h3>前往成田機場 ✈️</h3>
-                        <p>下午 3:30 前回淺草站取行李，搭乘「京成電鐵 Access 特快」直達成田機場。輕鬆辦理退稅、逛機場免稅店，準備搭乘 19:30 的班機平安返回台灣。</p>
-                        <a href="https://maps.google.com/?q=Asakusa+Station" target="_blank" class="map-link">📍 Google 地圖導航</a>
-                    </div>
-                </div>
-            </div>
+		<!-- Day 5 行程 -->
+		<div id="day5-panel" class="day-section">
+			<div class="day-title">
+				<span>Day 5 - 東京鐵塔、最後美食與快樂回程</span>
+				<span class="day-date">9/12 (六)</span>
+			</div>
+		
+			<div class="timeline">
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">08:00</div>
+					<div class="timeline-content">
+						<h3>東京鐵塔 🗼</h3>
+						<p>旅程最後一天早起前往東京鐵塔，欣賞早晨的東京街景，留下東京旅行的最後美好回憶。</p>
+						<a href="https://maps.google.com/?q=Tokyo+Tower" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">09:32</div>
+					<div class="timeline-content">
+						<h3>福德神社 ⛩️</h3>
+						<p>前往福德神社參拜，為這趟東京旅行畫下美好的句點。</p>
+						<span class="tag">祈願：財運、中獎！</span>
+						<a href="https://maps.google.com/?q=Fukutoku+Shrine" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">10:00</div>
+					<div class="timeline-content">
+						<h3>江戶肉割烹 さゝや 🥩</h3>
+						<p>享用旅程最後一餐，品嚐精緻的江戶肉割烹料理。</p>
+						<span class="tag">必吃：江戶肉割烹</span>
+						<a href="https://maps.google.com/?q=江戶肉割烹+さゝや" target="_blank" class="map-link">📍 Google 地圖導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">12:00</div>
+					<div class="timeline-content">
+						<h3>返回東京淺草站美滿如家飯店 🏨</h3>
+						<p>返回飯店整理行李、辦理退房並準備前往成田機場。</p>
+						<a href="https://maps.app.goo.gl/Tn6FVvoAxxtGBtXa8" target="_blank" class="map-link">📍 飯店位置導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">15:22</div>
+					<div class="timeline-content">
+						<h3>抵達成田國際機場 ✈️</h3>
+						<p>搭乘「京成電鐵 Access 特快」前往成田機場，辦理報到與退稅，逛逛機場免稅店，準備搭機回台灣。</p>
+						<span class="tag">✈️ 19:30 起飛</span>
+						<a href="https://maps.google.com/?q=Narita+International+Airport" target="_blank" class="map-link">📍 成田機場導航</a>
+					</div>
+				</div>
+		
+				<div class="timeline-item">
+					<div class="timeline-marker"></div>
+					<div class="timeline-time">19:30</div>
+					<div class="timeline-content">
+						<h3>成田機場 → 桃園機場 ✈️🇹🇼</h3>
+						<p>搭乘台灣虎航返回台灣，結束五天四夜的東京自由行！</p>
+						<span class="tag">✈️ 東京 → 台灣</span>
+					</div>
+				</div>
+		
+			</div>
 
             <!-- Day 5 記帳欄位 -->
             <div class="bookkeeping-box">
@@ -939,75 +1242,146 @@
         <!-- 3. 財務總覽與分帳結算分頁 -->
         <div id="summary-panel" class="day-section">
             
-            <!-- 出發前預定開銷與最終分帳 -->
-            <div class="info-section-card" style="border-left-color: #93b5c6;">
-                <h3>出發前預定開銷與分帳 (台幣 TWD)</h3>
-                
-                <!-- 機票 -->
-                <div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
-                        <span style="color: #636e72; font-weight: 500;">機票總費用 (媽媽付)</span>
-                        <span style="font-weight: bold; color: var(--dark-text);">NT$ 49,640</span>
-                    </div>
-                    <div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
-                        每人約 NT$ 12,410
-                    </div>
-                </div>
-                
-                <!-- 住宿 -->
-                <div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
-                        <span style="color: #636e72; font-weight: 500;">住宿總費用 (爸爸付)</span>
-                        <span style="font-weight: bold; color: var(--dark-text);">NT$ 32,140</span>
-                    </div>
-                    <div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
-                        每人約 NT$ 8,035
-                    </div>
-                </div>
-                
-                <!-- 換日幣 -->
-                <div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
-                        <span style="color: #636e72; font-weight: 500;">換日幣現金 (孟付)</span>
-                        <span style="font-weight: bold; color: var(--dark-text);">NT$ 40,560</span>
-                    </div>
-                    <div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
-                        每人約 NT$ 10,140
-                    </div>
-                </div>
-                
-                <!-- 總花費 (更新為 122,340) -->
-                <div class="info-row" style="background: #f0f7ff; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 1.05rem;">
-                    <span style="color: var(--sub-blue); font-weight: bold;">出發前總花費</span>
-                    <span style="color: var(--sub-blue); font-weight: bold;">NT$ 122,340</span>
-                </div>
-
-                <!-- 綜合每人平均 (更新為 30,585) -->
-                <div class="info-row" style="padding-top: 10px; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; color: var(--primary-red);">
-                    <span>👥 每人平均</span>
-                    <span style="font-weight: bold;">約 NT$ 30,585 / 人</span>
-                </div>
-
-                <!-- 內嵌分帳建議區塊 (更新精算金額) -->
-                <div style="margin-top: 15px; padding-top: 12px; border-top: 2px solid #e2e8f0;">
-                    <h4 style="font-size: 0.95rem; color: var(--dark-text); margin-bottom: 8px;">最終轉帳建議：</h4>
-                    <p style="font-size: 0.85rem; color: #636e72; margin-bottom: 10px;">
-                        以每人平均分攤 NT$ 30,585 計算，由「安」統一補齊給其他三人最簡單：
-                    </p>
-                    <div class="info-row" style="font-size: 0.9rem;">
-                        <span>安 需轉帳給 媽 (機票差額)</span>
-                        <span style="color: var(--primary-red); font-weight: bold;">NT$ 19,015</span>
-                    </div>
-                    <div class="info-row" style="font-size: 0.9rem;">
-                        <span>安 需轉帳給 爸 (住宿差額)</span>
-                        <span style="color: var(--primary-red); font-weight: bold;">NT$ 1,555</span>
-                    </div>
-                    <div class="info-row" style="font-size: 0.9rem; border-bottom: none;">
-                        <span>安 需轉帳給 孟 (換匯差額)</span>
-                        <span style="color: var(--primary-red); font-weight: bold;">NT$ 9,975</span>
-                    </div>
-                </div>
-            </div>
+			<!-- 出發前預定開銷與最終分帳 -->
+			<div class="info-section-card" style="border-left-color: #93b5c6;">
+				<h3>出發前預定開銷與分帳 (台幣 TWD)</h3>
+				
+				<!-- 機票：4人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">機票總費用 (媽)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 49,640</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						4 人分攤，每人 NT$ 12,410
+					</div>
+				</div>
+				
+				<!-- 住宿：4人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">住宿總費用 (爸)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 32,140</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						4 人分攤，每人 NT$ 8,035
+					</div>
+				</div>
+				
+				<!-- 換日幣：4人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">換日幣現金 (孟)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 40,560</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						4 人分攤，每人 NT$ 10,140
+					</div>
+				</div>
+			
+				<!-- 東京地鐵三日券：3人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">東京地鐵三日券 (媽)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 1,128</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						3 人分攤，每人 NT$ 376
+					</div>
+				</div>
+			
+				<!-- Skyliner：3人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">Skyliner 京成電鐵車票 (媽)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 2,484</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						3 人分攤，每人 NT$ 828
+					</div>
+				</div>
+			
+				<!-- 晴空塔：3人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">東京晴空塔門票 (媽)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 1,854</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						3 人分攤，每人 NT$ 618
+					</div>
+				</div>
+			
+				<!-- 機場接送：3人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">機場接送來回 (媽)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 2,782</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						3 人分攤，每人約 NT$ 927
+					</div>
+				</div>
+			
+				<!-- 網卡：3人分攤 -->
+				<div style="padding: 8px 0; border-bottom: 1px dashed #e2e8f0;">
+					<div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+						<span style="color: #636e72; font-weight: 500;">媽媽/孟網卡 (孟)</span>
+						<span style="font-weight: bold; color: var(--dark-text);">NT$ 628</span>
+					</div>
+					<div style="text-align: right; font-size: 0.82rem; color: #b2bec3; margin-top: 2px;">
+						2 人分攤，每人約 NT$ 314
+					</div>
+				</div>
+				
+				<!-- 總花費 -->
+				<div class="info-row" style="background: #f0f7ff; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 1.05rem;">
+					<span style="color: var(--sub-blue); font-weight: bold;">出發前總花費</span>
+					<span style="color: var(--sub-blue); font-weight: bold;">NT$ 131,216</span>
+				</div>
+			
+				<!-- 分攤計算說明 -->
+				<div class="info-row" style="padding-top: 10px; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; color: var(--primary-red);">
+					<span>👥 實際 3 人</span>
+					<span style="font-weight: bold;">每人約 NT$ 33,544</span>
+				</div>
+			
+				<div style="font-size: 0.82rem; color: #b2bec3; margin-top: 6px; line-height: 1.6;">
+					機票、住宿、日幣：4 人分攤<br>
+					新增交通、門票、網卡等費用：3 人分攤
+				</div>
+			
+				<!--
+				==================================================
+				最終轉帳分配（暫存，先不顯示）
+				
+				原始費用 3 項採 4 人分攤：
+				機票：49,640 ÷ 4 = 12,410 / 人
+				住宿：32,140 ÷ 4 = 8,035 / 人
+				日幣：40,560 ÷ 4 = 10,140 / 人
+				
+				原始三項每人分攤：
+				12,410 + 8,035 + 10,140 = 30,585
+				
+				新增費用 5 項採 3 人分攤：
+				東京地鐵三日券：1,128 ÷ 3 = 376
+				Skyliner：2,484 ÷ 3 = 828
+				晴空塔門票：1,854 ÷ 3 = 618
+				機場接送：2,782 ÷ 3 ≈ 927.33
+				網卡：628 ÷ 3 ≈ 209.33
+				
+				新增費用每人：
+				約 2,958.67
+				
+				實際旅客每人最終應負擔：
+				30,585 + 2,958.67 ≈ 33,543.67
+				約 NT$ 33,544 / 人
+				
+				※ 最終轉帳金額待確認後再計算
+				※ 爸爸雖然不出國，但機票／住宿／日幣仍按照原先 4 人分攤
+				==================================================
+				-->
+			</div>
 
             <!-- 卡片二：日本現地實際消費 (日幣) -->
             <div class="info-section-card" style="border-left-color: var(--primary-red);">
@@ -1042,7 +1416,6 @@
             <h3>選擇付款人 (可複選)</h3>
             <div class="modal-checkboxes">
                 <label><input type="checkbox" name="modal-payer" value="孟"> 孟</label>
-                <label><input type="checkbox" name="modal-payer" value="爸"> 爸</label>
                 <label><input type="checkbox" name="modal-payer" value="媽"> 媽</label>
                 <label><input type="checkbox" name="modal-payer" value="安"> 安</label>
                 <label><input type="checkbox" name="modal-payer" value="公費"> 公費</label>
@@ -1268,7 +1641,7 @@
             let grandTotalJPY = 0;
             const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.20;
             
-            const memberTotals = { "孟": 0, "爸": 0, "媽": 0, "安": 0, "公費": 0 };
+            const memberTotals = { "孟": 0, "媽": 0, "安": 0, "公費": 0 };
 
             for (let i = 1; i <= 5; i++) {
                 const dayData = tripExpenses[`day${i}`] || [];
