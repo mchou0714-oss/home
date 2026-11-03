@@ -1,0 +1,2928 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>辦公室小恐龍</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入自動生成的首頁與小恐龍數據檔 -->
+    <script
+      src="dino_data.txt"
+      onerror="console.log('尚未生成備份檔，將使用預設暫存')"
+    ></script>
+    <!-- 引入 Google Fonts (韓系字型) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- 引入 FontAwesome 圖示 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans TC", sans-serif;
+        background: transparent;
+        color: #4a3f35;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        position: relative;
+      }
+      .memo-box {
+        background: #fffdf9;
+        border: 1px solid #eae6df;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.01);
+        transition: all 0.3s;
+      }
+      /* 🦖 漂浮的電子雞本體 */
+      .floating-dino {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        width: 100%;
+        max-width: 360px;
+        height: auto;
+        background: rgba(255, 253, 249, 0.98);
+        backdrop-filter: blur(10px);
+        border: 1px solid #eae6df;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        border-radius: 1.5rem;
+        transition:
+          width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+          padding 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 99999;
+      }
+      .floating-dino.minimized {
+        width: auto !important;
+        border-radius: 9999px !important;
+        padding: 8px 16px !important;
+      }
+      .floating-dino.minimized > div:not(:first-child) {
+        display: none !important;
+      }
+      .floating-dino.minimized #dinoTitle {
+        display: none !important;
+      }
+      #dinoSpeech {
+        word-break: break-all;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+      }
+      @keyframes bossAlert {
+        0% {
+          border-color: #eae6df;
+          background: rgba(255, 253, 249, 0.98);
+        }
+        50% {
+          border-color: #e06c75;
+          background: rgba(255, 235, 238, 0.98);
+        }
+        100% {
+          border-color: #eae6df;
+          background: rgba(255, 253, 249, 0.98);
+        }
+      }
+      .boss-incoming {
+        animation: bossAlert 1s infinite;
+      }
+      /* 強制讓 hidden 真正隱藏元素 */
+      .hidden {
+        display: none !important;
+      }
+      #panelStats {
+        height: 105px !important;
+        max-height: 105px !important;
+        flex-direction: column !important;
+        justify-content: space-between !important; /* 讓三條進度條上下均分 */
+        padding: 4px 0 !important;
+      }
+      #panelStats > div {
+        display: flex !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+      }
+      #panelStats span {
+        flex-shrink: 0 !important;
+      }
+      .market-tab-btn {
+        font-size: 9px;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 6px 6px 0 0;
+        cursor: pointer;
+        background: #eae6df;
+        color: #8c7e70;
+        border: 1px solid #d9d2c5;
+        border-bottom: none;
+      }
+      .market-tab-btn.active {
+        background: #fffdf9;
+        color: #4a3f35;
+        font-weight: bold;
+        border-color: #eae6df;
+        border-bottom: 2px solid #fffdf9;
+        position: relative;
+        z-index: 10;
+      }
+      #panelMarket {
+        height: 200px !important;
+        min-height: 200px !important;
+        max-height: 200px !important;
+        overflow: hidden !important;
+      }
+
+      #marketContent {
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #d9d2c5 transparent;
+      }
+
+      #subPanelFood,
+      #subPanelGame,
+      #subPanelPet {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        align-content: start;
+      }
+
+      #subPanelFood:not(.hidden),
+      #subPanelGame:not(.hidden),
+      #subPanelPet:not(.hidden) {
+        display: grid;
+      }
+
+      .market-item {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #eae6df;
+        border-radius: 10px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 5px;
+        min-width: 0;
+      }
+
+      .market-game {
+        min-height: 54px;
+        text-align: left;
+        transition: background 0.2s;
+      }
+
+      .market-pet {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #eae6df;
+        border-radius: 10px;
+        padding: 7px 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
+        min-width: 0;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .market-pet:hover {
+        background: #f5f2eb;
+        border-color: #94a684;
+      }
+
+      .market-pet-emoji {
+        font-size: 23px;
+        line-height: 1.4;
+      }
+
+      .market-pet-name {
+        font-size: 10px;
+        font-weight: bold;
+        color: #4a3f35;
+      }
+
+      #panelStats {
+        height: 105px !important;
+        max-height: 105px !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        padding: 4px 0 !important;
+        overflow-y: auto !important;
+      }
+      /* 中間主要內容區 */
+      #panelFeed,
+      #panelAction,
+      #panelMarket,
+      #panelStock {
+        height: 200px !important;
+        min-height: 200px !important;
+        max-height: 200px !important;
+        overflow-y: auto !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 💡 小恐龍生存指南說明彈窗 -->
+    <div
+      id="dinoHelpModal"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center hidden"
+    >
+      <div
+        class="bg-white w-full max-w-lg mx-4 rounded-3xl border border-[#EFECE6] shadow-2xl flex flex-col overflow-hidden"
+      >
+        <div
+          class="px-6 py-4 border-b border-[#F5F2EB] flex justify-between items-center bg-[#FBF9F6]"
+        >
+          <h3 class="text-sm font-semibold text-[#4A3F35]">
+            辦公室小恐龍 — 社畜生存與華爾街指南
+          </h3>
+          <button
+            onclick="closeDinoHelpModal()"
+            class="text-[#8C7E70] cursor-pointer"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div
+          class="p-6 text-xs text-[#5C5247] space-y-3.5 leading-relaxed overflow-y-auto max-h-[65vh]"
+        >
+          <div class="bg-[#F5F2EB]/50 p-3 rounded-xl border border-[#EAE6DF]">
+            <p class="font-bold text-[#4A3F35] mb-1">🍗 1. 背包與餵食系統</p>
+            <p class="text-[#8C7E70]">
+              在「商場」買的食物會存進「背包」裡。當飢餓或口渴掉低於 30%
+              時，記得打開背包點擊食物餵它！派「長途打工」也能免費帶回高級名產喔！
+            </p>
+          </div>
+          <div class="bg-[#F5F2EB]/50 p-3 rounded-xl border border-[#EAE6DF]">
+            <p class="font-bold text-[#4A3F35] mb-1">
+              ⏰ 2. 上班打卡與離線分紅
+            </p>
+            <p class="text-[#8C7E70]">
+              點擊「上班打卡」啟動專注 Buff（數值消耗減半）。下班打卡拿 30
+              元，隔天開機還能領取離線摸魚分紅！
+            </p>
+          </div>
+          <div class="bg-[#F5F2EB]/50 p-3 rounded-xl border border-[#EAE6DF]">
+            <p class="font-bold text-[#4A3F35] mb-1">📈 3. 華爾街社畜股市</p>
+            <p class="text-[#8C7E70]">挑戰 4 檔迷因股，買賣賺取金幣！</p>
+          </div>
+        </div>
+        <div
+          class="px-6 py-3 border-t border-[#F5F2EB] bg-[#FBF9F6] flex justify-end"
+        >
+          <button
+            onclick="closeDinoHelpModal()"
+            class="bg-[#94A684] text-white px-4 py-2 rounded-xl text-xs font-medium cursor-pointer"
+          >
+            懂了，繼續摸魚！
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🦖 獨立電子雞主體 (調整 p-4 -> p-3, max-w-360px -> 330px 讓整體更小巧) -->
+    <div
+      id="dinoCard"
+      class="floating-dino p-3 rounded-2xl flex flex-col gap-2 shadow-2xl"
+      style="max-width: 330px"
+    >
+      <div
+        class="flex justify-between items-center text-[10px] font-bold text-[#8C7E70] w-full"
+      >
+        <div class="flex items-center gap-2">
+          <span class="flex items-center gap-1.5"
+            ><i class="fa-solid fa-shield-cat text-[#94A684]"></i>
+            辦公室小恐龍</span
+          >
+          <span
+            class="bg-[#F5F2EB] px-2 py-0.5 rounded-full text-[9px] text-[#7C7063] font-bold border border-[#EAE6DF]"
+          >
+            💰 <span id="coinCount">0</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="dinoTitle" class="text-[9px] text-[#A39E93] font-normal"
+            >狀態：正常運轉</span
+          >
+          <button
+            onclick="openDinoHelpModal()"
+            class="w-5 h-5 rounded-md bg-[#F5F2EB] hover:bg-[#EAE6DF] flex items-center justify-center text-[#4A3F35] cursor-pointer shrink-0"
+            title="小恐龍生存指南"
+          >
+            <i class="fa-solid fa-question text-[9px]"></i>
+          </button>
+          <button
+            onclick="toggleDinoMinimize()"
+            class="w-5 h-5 rounded-md bg-[#F5F2EB] hover:bg-[#EAE6DF] flex items-center justify-center text-[#4A3F35] cursor-pointer shrink-0"
+            title="收合/展開"
+          >
+            <i id="minimizeIcon" class="fa-solid fa-minus text-[9px]"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="dinoExpandedBody" class="flex flex-col gap-2.5">
+        <!-- 對話框 (加上 h-[46px] 與 overflow-hidden 鎖死高度，避免切換文字時跳動) -->
+        <div
+          class="bg-[#FFFDF9] px-2.5 py-1.5 rounded-2xl border border-[#EAE6DF] flex items-center gap-3 transition select-none shadow-xs min-h-[110px] overflow-y-auto"
+        >
+          <div
+            id="dinoIcon"
+            class="w-9 h-9 rounded-xl bg-[#F5F2EB] border border-[#EAE6DF] flex items-center justify-center text-xl shrink-0"
+          >
+            🦖
+          </div>
+          <div class="flex-1 min-w-0 h-full flex items-center overflow-auto">
+            <p
+              id="dinoSpeech"
+              class="text-[11px] text-[#5C5247] font-medium w-full leading-tight break-all whitespace-normal"
+            >
+              「吼——（隕石來啦!🔥）」
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="dinoPanel"
+          class="bg-[#F5F2EB]/50 p-2 rounded-xl border border-[#EAE6DF] min-h-[65px] flex flex-col justify-center"
+        >
+          <!-- 狀態 -->
+          <div
+            id="panelStats"
+            class="hidden flex flex-col text-[9px] text-[#A39E93]"
+          >
+            <div class="flex items-center gap-2">
+              <span class="w-8 shrink-0 text-[#7C7063] font-bold">🍗 飢餓</span>
+              <div
+                class="flex-1 h-1.5 bg-[#EAE6DF] rounded-full overflow-hidden"
+              >
+                <div
+                  id="hungerBar"
+                  class="h-full bg-[#94A684] w-[80%] rounded-full"
+                ></div>
+              </div>
+              <span
+                id="hungerText"
+                class="w-7 text-right font-bold text-[#5C5247]"
+                >80%</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 shrink-0 text-[#7C7063] font-bold">☕ 口渴</span>
+              <div
+                class="flex-1 h-1.5 bg-[#EAE6DF] rounded-full overflow-hidden"
+              >
+                <div
+                  id="thirstBar"
+                  class="h-full bg-[#54B4D3] w-[80%] rounded-full"
+                ></div>
+              </div>
+              <span
+                id="thirstText"
+                class="w-7 text-right font-bold text-[#5C5247]"
+                >80%</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 shrink-0 text-[#7C7063] font-bold">✨ 心情</span>
+              <div
+                class="flex-1 h-1.5 bg-[#EAE6DF] rounded-full overflow-hidden"
+              >
+                <div
+                  id="moodBar"
+                  class="h-full bg-[#E5A953] w-[80%] rounded-full"
+                ></div>
+              </div>
+              <span
+                id="moodText"
+                class="w-7 text-right font-bold text-[#5C5247]"
+                >80%</span
+              >
+            </div>
+          </div>
+
+          <!-- 背包 -->
+          <div id="panelFeed" class="hidden flex flex-col h-full text-xs">
+            <!-- 背包分類 -->
+            <div class="grid grid-cols-2 gap-1 mb-2">
+              <button
+                onclick="switchBagCategory('food')"
+                id="bagTabFood"
+                class="bg-[#94A684] text-white rounded-lg py-1 text-[10px] font-bold"
+              >
+                🍗 一般食物
+              </button>
+
+              <button
+                onclick="switchBagCategory('snack')"
+                id="bagTabSnack"
+                class="bg-white text-[#7C7063] border border-[#EAE6DF] rounded-lg py-1 text-[10px] font-bold"
+              >
+                🍪 打工零食
+              </button>
+            </div>
+
+            <!-- 一般食物 -->
+            <div id="bagFoodSection">
+              <div class="grid grid-cols-6 gap-1.5 text-center">
+                <div
+                  onclick="selectBagItem('chicken')"
+                  id="slot_chicken"
+                  class="relative bg-white hover:bg-[#F5F2EB] p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center transition select-none"
+                >
+                  <span class="text-sm">🍗</span>
+                  <span
+                    id="count_chicken"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('sprite')"
+                  id="slot_sprite"
+                  class="relative bg-white hover:bg-[#F5F2EB] p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center transition select-none"
+                >
+                  <span class="text-sm">🧊</span>
+                  <span
+                    id="count_sprite"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('beer')"
+                  id="slot_beer"
+                  class="relative bg-white hover:bg-[#F5F2EB] p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center transition select-none"
+                >
+                  <span class="text-sm">🍺</span>
+                  <span
+                    id="count_beer"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('salad')"
+                  id="slot_salad"
+                  class="relative bg-white hover:bg-[#F5F2EB] p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center transition select-none"
+                >
+                  <span class="text-sm">🥗</span>
+                  <span
+                    id="count_salad"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- 打工零食 -->
+            <div id="bagSnackSection" class="hidden">
+              <div class="grid grid-cols-6 gap-1.5 text-center">
+                <div
+                  onclick="selectBagItem('cookie')"
+                  id="slot_cookie"
+                  class="relative bg-white p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <span class="text-sm">🍪</span>
+                  <span
+                    id="count_cookie"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('cake')"
+                  id="slot_cake"
+                  class="relative bg-white p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <span class="text-sm">🧁</span>
+                  <span
+                    id="count_cake"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('candy')"
+                  id="slot_candy"
+                  class="relative bg-white p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <span class="text-sm">🍬</span>
+                  <span
+                    id="count_candy"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('chocolate')"
+                  id="slot_chocolate"
+                  class="relative bg-white p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <span class="text-sm">🍫</span>
+                  <span
+                    id="count_chocolate"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('donut')"
+                  id="slot_donut"
+                  class="relative bg-white p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <span class="text-sm">🍩</span>
+                  <span
+                    id="count_donut"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+
+                <div
+                  onclick="selectBagItem('biscuit')"
+                  id="slot_biscuit"
+                  class="relative bg-white p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <span class="text-sm">🥨</span>
+                  <span
+                    id="count_biscuit"
+                    class="absolute bottom-0.5 right-1 text-[9px] text-[#8C7E70] font-bold"
+                    >0</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 互動 -->
+          <div id="panelAction" class="hidden grid grid-cols-4 gap-1">
+            <button
+              onclick="dailyCheckIn()"
+              id="checkinBtn"
+              class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 py-1 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-emerald-200 flex flex-col items-center justify-center"
+            >
+              🎁 每日簽到
+            </button>
+
+            <button
+              onclick="playToy()"
+              class="bg-white hover:bg-[#E5A953] hover:text-white text-[#7C7063] py-1 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-[#EAE6DF] flex flex-col items-center justify-center"
+            >
+              🎾 摸摸頭
+            </button>
+
+            <button
+              onclick="giveHug()"
+              class="bg-white hover:bg-pink-400 hover:text-white text-[#7C7063] py-0.5 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-[#EAE6DF] flex flex-col items-center justify-center"
+            >
+              🫂 抱抱充電
+            </button>
+
+            <button
+              onclick="sendDinoToWork()"
+              id="workBtn"
+              class="bg-white hover:bg-[#94A684] hover:text-white text-stone-700 py-1 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-[#EAE6DF] flex flex-col items-center justify-center"
+            >
+              💼 派打工
+            </button>
+
+            <button
+              onclick="punchAir()"
+              class="bg-white hover:bg-rose-500 hover:text-white text-[#7C7063] py-1 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-[#EAE6DF] flex flex-col items-center justify-center"
+            >
+              🥊 揮拳發洩
+            </button>
+
+            <button
+              onclick="takePaidPoop()"
+              class="bg-white hover:bg-amber-600 hover:text-white text-[#7C7063] py-1 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-[#EAE6DF] flex flex-col items-center justify-center"
+            >
+              ☕ 帶薪大便
+            </button>
+          </div>
+
+          <!-- 🛒 商場 -->
+          <div id="panelMarket" class="hidden flex flex-col gap-1 text-xs">
+            <!-- 商場分類 -->
+            <div
+              class="flex gap-1 px-1 border-b border-[#EAE6DF] items-end shrink-0"
+            >
+              <button
+                onclick="switchMarketSubTab('food')"
+                id="subTabFood"
+                class="market-tab-btn active flex-1 text-center"
+              >
+                🍖 食物補給
+              </button>
+
+              <button
+                onclick="switchMarketSubTab('game')"
+                id="subTabGame"
+                class="market-tab-btn flex-1 text-center"
+              >
+                🎰 地下遊藝
+              </button>
+
+              <button
+                onclick="switchMarketSubTab('pet')"
+                id="subTabPet"
+                class="market-tab-btn flex-1 text-center"
+              >
+                🦖 寵物商城
+              </button>
+            </div>
+
+            <!-- 商場商品內容 -->
+            <div
+              id="marketContent"
+              class="bg-white/60 p-1.5 rounded-xl rounded-tl-none border border-[#EAE6DF] flex-1"
+            >
+              <!-- 🍖 食物補給 -->
+              <div id="subPanelFood" class="grid grid-cols-2 text-[10px]">
+                <!-- 雞排 -->
+                <div class="market-item">
+                  <div class="flex items-center justify-between gap-1">
+                    <div>
+                      <div class="font-bold text-[#4A3F35]">🍗 雞排</div>
+                      <div class="text-amber-600 font-bold">$20</div>
+                    </div>
+
+                    <div
+                      class="flex items-center border border-[#EAE6DF] rounded-lg bg-white overflow-hidden"
+                    >
+                      <button
+                        onclick="changeFoodQty('chicken', -1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        id="chickenQty"
+                        value="1"
+                        min="1"
+                        max="15"
+                        class="w-5 text-center text-[10px] font-bold focus:outline-none"
+                      />
+                      <button
+                        onclick="changeFoodQty('chicken', 1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onclick="buyMarketItem('chicken')"
+                    class="bg-[#94A684] hover:bg-[#839573] text-white py-1 rounded-md text-[9px] font-bold"
+                  >
+                    🛒 購買
+                  </button>
+                </div>
+
+                <!-- 雪碧 -->
+                <div class="market-item">
+                  <div class="flex items-center justify-between gap-1">
+                    <div>
+                      <div class="font-bold text-[#4A3F35]">🧊 雪碧</div>
+                      <div class="text-amber-600 font-bold">$15</div>
+                    </div>
+
+                    <div
+                      class="flex items-center border border-[#EAE6DF] rounded-lg bg-white overflow-hidden"
+                    >
+                      <button
+                        onclick="changeFoodQty('sprite', -1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        id="spriteQty"
+                        value="1"
+                        min="1"
+                        max="15"
+                        class="w-5 text-center text-[10px] font-bold focus:outline-none"
+                      />
+                      <button
+                        onclick="changeFoodQty('sprite', 1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onclick="buyMarketItem('sprite')"
+                    class="bg-[#54B4D3] hover:bg-[#439ab8] text-white py-1 rounded-md text-[9px] font-bold"
+                  >
+                    🛒 購買
+                  </button>
+                </div>
+
+                <!-- 啤酒 -->
+                <div class="market-item">
+                  <div class="flex items-center justify-between gap-1">
+                    <div>
+                      <div class="font-bold text-[#4A3F35]">🍺 啤酒</div>
+                      <div class="text-amber-600 font-bold">$15</div>
+                    </div>
+
+                    <div
+                      class="flex items-center border border-[#EAE6DF] rounded-lg bg-white overflow-hidden"
+                    >
+                      <button
+                        onclick="changeFoodQty('beer', -1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        id="beerQty"
+                        value="1"
+                        min="1"
+                        max="15"
+                        class="w-5 text-center text-[10px] font-bold focus:outline-none"
+                      />
+                      <button
+                        onclick="changeFoodQty('beer', 1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onclick="buyMarketItem('beer')"
+                    class="bg-amber-600 hover:bg-amber-700 text-white py-1 rounded-md text-[9px] font-bold"
+                  >
+                    🛒 購買
+                  </button>
+                </div>
+
+                <!-- 沙拉 -->
+                <div class="market-item">
+                  <div class="flex items-center justify-between gap-1">
+                    <div>
+                      <div class="font-bold text-[#4A3F35]">🥗 沙拉</div>
+                      <div class="text-amber-600 font-bold">$5</div>
+                    </div>
+
+                    <div
+                      class="flex items-center border border-[#EAE6DF] rounded-lg bg-white overflow-hidden"
+                    >
+                      <button
+                        onclick="changeFoodQty('salad', -1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        id="saladQty"
+                        value="1"
+                        min="1"
+                        max="15"
+                        class="w-5 text-center text-[10px] font-bold focus:outline-none"
+                      />
+                      <button
+                        onclick="changeFoodQty('salad', 1)"
+                        class="px-1.5 py-1 hover:bg-stone-100 font-bold"
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onclick="buyMarketItem('salad')"
+                    class="bg-[#E5A953] hover:bg-[#d49842] text-white py-1 rounded-md text-[9px] font-bold"
+                  >
+                    🛒 購買
+                  </button>
+                </div>
+              </div>
+
+              <!-- 🎰 地下遊藝 -->
+              <div
+                id="subPanelGame"
+                class="hidden grid grid-cols-2 text-[10px]"
+              >
+                <button
+                  onclick="playCoinFlip()"
+                  class="market-game bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-lg p-2"
+                >
+                  <div class="font-bold text-[11px]">🪙 硬幣連莊</div>
+                  <div class="text-[9px] text-indigo-500 mt-1">
+                    猜正反面，試試手氣
+                  </div>
+                  <div class="font-bold mt-1">$10 / 次</div>
+                </button>
+
+                <button
+                  onclick="playSlotMachine()"
+                  class="market-game bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded-lg p-2"
+                >
+                  <div class="font-bold text-[11px]">🧋 珍奶拉霸</div>
+                  <div class="text-[9px] text-purple-500 mt-1">
+                    珍奶連線拿大獎
+                  </div>
+                  <div class="font-bold mt-1">$25 / 次</div>
+                </button>
+
+                <button
+                  onclick="playBossFistGame()"
+                  class="market-game bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg p-2"
+                >
+                  <div class="font-bold text-[11px]">🥊 主管猜拳</div>
+                  <div class="text-[9px] text-rose-500 mt-1">
+                    挑戰主管，贏取獎金
+                  </div>
+                  <div class="font-bold mt-1">$15 / 次</div>
+                </button>
+
+                <button
+                  onclick="playGashapon()"
+                  class="market-game bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg p-2"
+                >
+                  <div class="font-bold text-[11px]">🎰 摸魚轉蛋</div>
+                  <div class="text-[9px] text-amber-600 mt-1">
+                    抽取神祕辦公室道具
+                  </div>
+                  <div class="font-bold mt-1">$15 / 次</div>
+                </button>
+              </div>
+
+              <!-- 🦖 寵物商城 -->
+              <div id="subPanelPet" class="hidden grid grid-cols-2 text-[10px]">
+                <div class="market-pet" onclick="showPetInfo('dino')">
+                  <span class="market-pet-emoji">🦖</span>
+                  <span class="market-pet-name">經典小恐龍</span>
+                  <span class="text-[9px] text-[#94A684]">免費夥伴</span>
+                  <button
+                    id="btn_pet_dino"
+                    onclick="
+                      event.stopPropagation();
+                      equipPet('dino', '🦖');
+                    "
+                    class="bg-[#94A684] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    裝備
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('boss')">
+                  <span class="market-pet-emoji">👔</span>
+                  <span class="market-pet-name">暴龍主管</span>
+                  <span class="text-[9px] text-amber-600">$100</span>
+                  <button
+                    id="btn_pet_boss"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('boss', '👔', 100);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('cat')">
+                  <span class="market-pet-emoji">🐱</span>
+                  <span class="market-pet-name">加班貓貓</span>
+                  <span class="text-[9px] text-amber-600">$250</span>
+                  <button
+                    id="btn_pet_cat"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('cat', '🐱', 250);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('rabbit')">
+                  <span class="market-pet-emoji">🐰</span>
+                  <span class="market-pet-name">咖啡因兔</span>
+                  <span class="text-[9px] text-amber-600">$350</span>
+                  <button
+                    id="btn_pet_rabbit"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('rabbit', '🐰', 350);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('seal')">
+                  <span class="market-pet-emoji">🦭</span>
+                  <span class="market-pet-name">摸魚海豹</span>
+                  <span class="text-[9px] text-amber-600">$500</span>
+                  <button
+                    id="btn_pet_seal"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('seal', '🦭', 500);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('frog')">
+                  <span class="market-pet-emoji">🐸</span>
+                  <span class="market-pet-name">工程師蛙</span>
+                  <span class="text-[9px] text-amber-600">$600</span>
+                  <button
+                    id="btn_pet_frog"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('frog', '🐸', 600);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('panda')">
+                  <span class="market-pet-emoji">🐼</span>
+                  <span class="market-pet-name">熊貓會計</span>
+                  <span class="text-[9px] text-amber-600">$800</span>
+                  <button
+                    id="btn_pet_panda"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('panda', '🐼', 800);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+
+                <div class="market-pet" onclick="showPetInfo('pigeon')">
+                  <span class="market-pet-emoji">🕊️</span>
+                  <span class="market-pet-name">躺平鴿子</span>
+                  <span class="text-[9px] text-amber-600">$1000</span>
+                  <button
+                    id="btn_pet_pigeon"
+                    onclick="
+                      event.stopPropagation();
+                      buyOrEquipPet('pigeon', '🕊️', 1000);
+                    "
+                    class="bg-[#54B4D3] text-white px-2 py-1 rounded-md font-bold w-full"
+                  >
+                    購買
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 股市 -->
+          <div
+            id="panelStock"
+            class="hidden flex flex-col gap-1.5 text-[10px] max-h-[140px] overflow-y-auto pr-1"
+          >
+            <div
+              class="bg-white/60 p-1.5 rounded-lg border border-[#EAE6DF] flex flex-col gap-0.5"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-[#4A3F35]"
+                  >🧋 珍奶指數
+                  <span id="bbtPrice" class="text-amber-600">($10)</span></span
+                >
+                <div class="flex items-center gap-1">
+                  <div
+                    class="flex items-center border border-[#EAE6DF] rounded bg-white overflow-hidden"
+                  >
+                    <button
+                      onclick="changeStockQty('bbt', -1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      id="bbtQty"
+                      value="1"
+                      min="1"
+                      max="50"
+                      class="w-6 text-center bg-transparent text-[10px] font-bold focus:outline-none"
+                    />
+                    <button
+                      onclick="changeStockQty('bbt', 1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    onclick="buyStock('bbt')"
+                    class="bg-[#94A684] text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    買
+                  </button>
+                  <button
+                    onclick="sellStock('bbt')"
+                    class="bg-rose-400 text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    賣
+                  </button>
+                </div>
+              </div>
+              <div class="flex justify-between text-[9px] text-[#8C7E70]">
+                <span
+                  >持有:<span id="bbtHolding">0</span>張 (均價:$<span
+                    id="bbtAvg"
+                    >0</span
+                  >)</span
+                >
+                <span id="bbtProfit" class="font-bold">損益:$0</span>
+              </div>
+            </div>
+            <div
+              class="bg-white/60 p-1.5 rounded-lg border border-[#EAE6DF] flex flex-col gap-0.5"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-[#4A3F35]"
+                  >🌴 特休期貨
+                  <span id="ptoPrice" class="text-indigo-600">($25)</span></span
+                >
+                <div class="flex items-center gap-1">
+                  <div
+                    class="flex items-center border border-[#EAE6DF] rounded bg-white overflow-hidden"
+                  >
+                    <button
+                      onclick="changeStockQty('pto', -1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      id="ptoQty"
+                      value="1"
+                      min="1"
+                      max="50"
+                      class="w-6 text-center bg-transparent text-[10px] font-bold focus:outline-none"
+                    />
+                    <button
+                      onclick="changeStockQty('pto', 1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    onclick="buyStock('pto')"
+                    class="bg-[#94A684] text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    買
+                  </button>
+                  <button
+                    onclick="sellStock('pto')"
+                    class="bg-rose-400 text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    賣
+                  </button>
+                </div>
+              </div>
+              <div class="flex justify-between text-[9px] text-[#8C7E70]">
+                <span
+                  >持有:<span id="ptoHolding">0</span>張 (均價:$<span
+                    id="ptoAvg"
+                    >0</span
+                  >)</span
+                >
+                <span id="ptoProfit" class="font-bold">損益:$0</span>
+              </div>
+            </div>
+            <div
+              class="bg-white/60 p-1.5 rounded-lg border border-[#EAE6DF] flex flex-col gap-0.5"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-[#4A3F35]"
+                  >💻 筆電砸毀
+                  <span id="crashPrice" class="text-rose-600">($50)</span></span
+                >
+                <div class="flex items-center gap-1">
+                  <div
+                    class="flex items-center border border-[#EAE6DF] rounded bg-white overflow-hidden"
+                  >
+                    <button
+                      onclick="changeStockQty('crash', -1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      id="crashQty"
+                      value="1"
+                      min="1"
+                      max="50"
+                      class="w-6 text-center bg-transparent text-[10px] font-bold focus:outline-none"
+                    />
+                    <button
+                      onclick="changeStockQty('crash', 1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    onclick="buyStock('crash')"
+                    class="bg-[#94A684] text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    買
+                  </button>
+                  <button
+                    onclick="sellStock('crash')"
+                    class="bg-rose-400 text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    賣
+                  </button>
+                </div>
+              </div>
+              <div class="flex justify-between text-[9px] text-[#8C7E70]">
+                <span
+                  >持有:<span id="crashHolding">0</span>張 (均價:$<span
+                    id="crashAvg"
+                    >0</span
+                  >)</span
+                >
+                <span id="crashProfit" class="font-bold">損益:$0</span>
+              </div>
+            </div>
+            <div
+              class="bg-white/60 p-1.5 rounded-lg border border-[#EAE6DF] flex flex-col gap-0.5"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-[#4A3F35]"
+                  >☕ 加班迷因幣
+                  <span id="otPrice" class="text-emerald-600">($5)</span></span
+                >
+                <div class="flex items-center gap-1">
+                  <div
+                    class="flex items-center border border-[#EAE6DF] rounded bg-white overflow-hidden"
+                  >
+                    <button
+                      onclick="changeStockQty('ot', -1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      id="otQty"
+                      value="1"
+                      min="1"
+                      max="50"
+                      class="w-6 text-center bg-transparent text-[10px] font-bold focus:outline-none"
+                    />
+                    <button
+                      onclick="changeStockQty('ot', 1)"
+                      class="px-1 py-0.5 hover:bg-stone-100 text-stone-600 font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    onclick="buyStock('ot')"
+                    class="bg-[#94A684] text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    買
+                  </button>
+                  <button
+                    onclick="sellStock('ot')"
+                    class="bg-rose-400 text-white px-1.5 py-0.5 rounded font-bold cursor-pointer"
+                  >
+                    賣
+                  </button>
+                </div>
+              </div>
+              <div class="flex justify-between text-[9px] text-[#8C7E70]">
+                <span
+                  >持有:<span id="otHolding">0</span>張 (均價:$<span id="otAvg"
+                    >0</span
+                  >)</span
+                >
+                <span id="otProfit" class="font-bold">損益:$0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部功能切換分頁列 -->
+        <div class="grid grid-cols-5 gap-1 pt-0.5">
+          <button
+            onclick="switchDinoTab('stats')"
+            id="tabStats"
+            class="bg-[#94A684] text-white py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center"
+          >
+            <i class="fa-solid fa-heart-pulse text-[9px]"></i> 狀態
+          </button>
+          <button
+            onclick="switchDinoTab('feed')"
+            id="tabFeed"
+            class="bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center"
+          >
+            <i class="fa-solid fa-box-archive text-[9px]"></i> 背包
+          </button>
+          <button
+            onclick="switchDinoTab('action')"
+            id="tabAction"
+            class="bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center"
+          >
+            <i class="fa-solid fa-briefcase text-[9px]"></i> 互動
+          </button>
+          <button
+            onclick="switchDinoTab('market')"
+            id="tabMarket"
+            class="bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center"
+          >
+            <i class="fa-solid fa-store text-[9px]"></i> 商場
+          </button>
+          <button
+            onclick="switchDinoTab('stock')"
+            id="tabStock"
+            class="bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center"
+          >
+            <i class="fa-solid fa-chart-line text-[9px]"></i> 股市
+          </button>
+        </div>
+      </div>
+
+      <!-- 設定選單 -->
+      <div
+        class="pt-1 border-t border-[#F2ECE1] flex justify-end relative text-[10px]"
+      >
+        <button
+          onclick="toggleSettingsMenu(event)"
+          class="w-6 h-6 rounded-md hover:bg-[#EAE6DF] text-[#A39E93] hover:text-[#4A3F35] transition flex items-center justify-center cursor-pointer"
+          title="系統設定與備份"
+        >
+          <i class="fa-solid fa-gear text-[10px]"></i>
+        </button>
+        <div
+          id="settingsMenu"
+          class="hidden absolute bottom-8 right-0 bg-[#FFFDF9] border border-[#EAE6DF] shadow-lg rounded-xl p-1.5 flex flex-col gap-1 w-28 z-50"
+        >
+          <button
+            onclick="
+              exportData();
+              toggleSettingsMenu(event);
+            "
+            class="text-left px-2.5 py-1.5 hover:bg-[#F5F2EB] rounded-lg text-[#7C7063] flex items-center gap-1.5 transition cursor-pointer"
+          >
+            備份數據
+          </button>
+          <button
+            onclick="
+              document.getElementById('importFile').click();
+              toggleSettingsMenu(event);
+            "
+            class="text-left px-2.5 py-1.5 hover:bg-[#F5F2EB] rounded-lg text-[#7C7063] flex items-center gap-1.5 transition cursor-pointer"
+          >
+            匯入數據
+          </button>
+          <input
+            type="file"
+            id="importFile"
+            accept=".txt,.json"
+            onchange="importData(event)"
+            class="hidden"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 💡 JavaScript 邏輯 -->
+    <script>
+      let dinoStats = {
+        hunger: 80,
+        thirst: 80,
+        mood: 80,
+        coins: parseInt(localStorage.getItem("dino_coins")) || 0,
+        bag: JSON.parse(localStorage.getItem("dino_bag")) || {
+          chicken: 1,
+          sprite: 1,
+          beer: 0,
+          salad: 0,
+        },
+      };
+
+      let isSleeping = false;
+      let isWorking = false;
+      let idleTimer = null;
+
+      window.onload = function () {
+        updateBagUI();
+        ["bbt", "pto", "crash", "ot"].forEach((type) => {
+          stockMarket[type].holding =
+            parseInt(localStorage.getItem(`stock_${type}_holding`)) || 0;
+          stockMarket[type].totalCost =
+            parseInt(localStorage.getItem(`stock_${type}_cost`)) || 0;
+        });
+        updateStockUI();
+
+        if (typeof localDinoData !== "undefined" && localDinoData.data) {
+          const saved = localDinoData.data;
+          if (saved.coins !== undefined) dinoStats.coins = saved.coins;
+          if (saved.hunger !== undefined) dinoStats.hunger = saved.hunger;
+          if (saved.thirst !== undefined) dinoStats.thirst = saved.thirst;
+          if (saved.mood !== undefined) dinoStats.mood = saved.mood;
+          if (saved.bag !== undefined) {
+            dinoStats.bag = saved.bag;
+            localStorage.setItem("dino_bag", JSON.stringify(dinoStats.bag));
+            updateBagUI();
+          }
+          if (saved.unlocked_pets !== undefined) {
+            unlockedPets = saved.unlocked_pets;
+            localStorage.setItem(
+              "dino_unlocked_pets",
+              JSON.stringify(unlockedPets),
+            );
+          }
+          if (saved.current_pet !== undefined) {
+            currentPetEmoji = saved.current_pet;
+            localStorage.setItem("dino_current_pet", currentPetEmoji);
+            const iconEl = document.getElementById("dinoIcon");
+            if (iconEl) iconEl.innerText = currentPetEmoji;
+          }
+          updatePetStoreUI();
+        }
+
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+        updateStatsUI();
+        resetIdleTimer();
+
+        const finishTime = localStorage.getItem("dino_work_finish");
+        if (finishTime && Date.now() < parseInt(finishTime)) {
+          updateWorkStateUI();
+        }
+
+        // 🌟 強制初始化：開機預設顯示狀態分頁
+        switchDinoTab("stats");
+      };
+
+      window.addEventListener("DOMContentLoaded", () => {
+        updateCheckinButtonUI();
+
+        const hasNewLog = localStorage.getItem("dino_has_new_log");
+        if (hasNewLog === "true") {
+          localStorage.removeItem("dino_has_new_log");
+          dinoStats.coins += 15;
+          localStorage.setItem("dino_coins", dinoStats.coins);
+
+          const coinElem = document.getElementById("coinCount");
+          if (coinElem) coinElem.innerText = dinoStats.coins;
+
+          setTimeout(() => {
+            const speechEl = document.getElementById("dinoSpeech");
+            if (speechEl) {
+              let logRewardMsg = "⟨偵測到主人去寫工作紀錄，頒發 15 元獎金💰✨⟩";
+              if (currentPetEmoji === "👔") {
+                logRewardMsg =
+                  "⟨不錯！有按時交週報，特此核發 15 元 KPI 獎金！👔📈⟩";
+              } else if (currentPetEmoji === "🐱") {
+                logRewardMsg =
+                  "⟨喵～ 寫完工作紀錄了，賞你 15 元去買罐頭孝敬本大爺 🥫🐾⟩";
+              } else if (currentPetEmoji === "🦭") {
+                logRewardMsg =
+                  "⟨阿肉～ 居然有寫週報，獎勵 15 塊錢去買冰塊躺平 🦭🧊⟩";
+              }
+              speechEl.innerText = logRewardMsg;
+            }
+          }, 1000);
+        }
+        checkOfflineBonus();
+        checkOfflineMarketAndDividends();
+      });
+
+      // ==================== 摸摸頭專屬金句 ====================
+
+      const petHeadPatLines = {
+        "🦖": [
+          "「嘿嘿！今天也要當一隻快樂的小恐龍！」",
+          "「再摸一下嘛！我還沒充飽電！」",
+          "「被摸頭的恐龍，今天不會生氣！」",
+          "「今天的煩惱先放旁邊，陪我玩！」",
+          "「我是不是全世界最可愛的恐龍？」",
+          "「摸摸頭可以增加幸福值喔！」",
+          "「今天也要努力吃飯和睡覺！」",
+          "「嘿！你是不是偷偷喜歡我？」",
+          "「再摸一下，我就原諒老闆了！」",
+          "「這就是被寵愛的感覺嗎？」",
+        ],
+
+        "👔": [
+          "「嗯？這是主管專屬的按摩服務嗎？」",
+          "「表現不錯，准你再摸三秒。」",
+          "「今天的 KPI 就是被摸頭！」",
+          "「這份員工福利我很滿意。」",
+          "「摸完頭記得繼續努力工作。」",
+          "「本主管批准你休息五分鐘。」",
+          "「這麼會摸頭，考慮升你當副主管。」",
+          "「今天的會議取消，我要被摸頭。」",
+          "「獎金可以晚點發，摸頭不能停。」",
+          "「很好，這就是團隊凝聚力。」",
+        ],
+
+        "🐱": [
+          "「呼嚕呼嚕……再摸一下。」",
+          "「本喵今天不想加班。」",
+          "「摸頭服務請持續供應。」",
+          "「喵！這是員工福利嗎？」",
+          "「我決定今天先不抓老闆。」",
+          "「再摸一下，我就原諒世界。」",
+          "「工作可以等等，貓咪要先被摸。」",
+          "「本喵的可愛程度又提升了。」",
+          "「你是不是被我的魅力征服了？」",
+          "「喵～今天也要一起摸魚！」",
+        ],
+
+        "🐰": [
+          "「蹦蹦！摸頭讓我充滿咖啡因！」",
+          "「今天也要元氣滿滿！」",
+          "「再摸一下，我就能跑十圈！」",
+          "「我的耳朵是不是很可愛？」",
+          "「咖啡先放著，我要摸頭！」",
+          "「幸福感已經超過咖啡了！」",
+          "「蹦！今天也要順順利利！」",
+          "「摸頭是最棒的充電方式！」",
+          "「我要把這份幸福存起來！」",
+          "「今天的煩惱就交給胡蘿蔔吧！」",
+        ],
+
+        "🦭": [
+          "「躺平中……請勿打擾。」",
+          "「摸頭可以，但我不想上班。」",
+          "「今天的目標是躺得更舒服。」",
+          "「老闆找我？我不在喔。」",
+          "「這就是海豹的幸福生活。」",
+          "「再摸一下，我就繼續躺平。」",
+          "「工作太累了，先摸摸頭吧。」",
+          "「人生苦短，摸魚要趁早。」",
+          "「我已經準備好迎接下一次休息。」",
+          "「不努力也沒關係，先開心就好。」",
+        ],
+
+        "🐸": [
+          "「呱！這是什麼新型除錯方式？」",
+          "「摸頭成功！Bug 減少 0.1 個。」",
+          "「程式可以重跑，幸福不能重來！」",
+          "「今天的心情沒有 Runtime Error！」",
+          "「再摸一下，我就修好程式了！」",
+          "「呱呱！這是工程師的療癒時刻。」",
+          "「不要催，我正在思考人生。」",
+          "「這個摸頭功能沒有 Bug！」",
+          "「今天也要順利 Deploy！」",
+          "「摸頭比 Debug 還有效！」",
+        ],
+
+        "🐼": [
+          "「摸頭一下，帳本就變幸福了。」",
+          "「今天的支出：一份摸頭快樂。」",
+          "「這筆幸福收入我先記下來。」",
+          "「再摸一下，心情就不用對帳了。」",
+          "「今天的財務狀況：幸福滿分！」",
+          "「摸頭不用發票，謝謝。」",
+          "「這是我最喜歡的非現金收入。」",
+          "「工作再忙，也要記得快樂。」",
+          "「今天的心情沒有赤字！」",
+          "「這筆摸頭收入，我要永久保存。」",
+        ],
+
+        "🕊️": [
+          "「咕咕……今天不想努力了。」",
+          "「自由的靈魂不需要打卡。」",
+          "「摸完頭，我要繼續放空。」",
+          "「世界很大，我想先睡一下。」",
+          "「今天也要優雅地躺平。」",
+          "「別急，人生不是限時任務。」",
+          "「摸頭是我今天唯一的工作。」",
+          "「我已經飛到快樂的地方了。」",
+          "「不加班的日子真美好。」",
+          "「咕咕！讓我們一起逃離辦公室！」",
+        ],
+      };
+
+      let lastHeadPatLineByPet = {};
+
+      function playToy() {
+        if (isWorking || isSleeping) return;
+
+        resetIdleTimer();
+
+        dinoStats.mood = Math.min(100, dinoStats.mood + 15);
+        updateStatsUI();
+
+        const lines = petHeadPatLines[currentPetEmoji] || petHeadPatLines["🦖"];
+
+        let line;
+
+        do {
+          line = lines[Math.floor(Math.random() * lines.length)];
+        } while (
+          lines.length > 1 &&
+          line === lastHeadPatLineByPet[currentPetEmoji]
+        );
+
+        lastHeadPatLineByPet[currentPetEmoji] = line;
+
+        document.getElementById("dinoSpeech").innerText = line;
+      }
+
+      // ==================== 每日簽到 ====================
+
+      function getTodayKey() {
+        const today = new Date();
+        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+      }
+
+      function updateCheckinButtonUI() {
+        const btn = document.getElementById("checkinBtn");
+        if (!btn) return;
+
+        const done =
+          localStorage.getItem("dino_last_checkin") === getTodayKey();
+
+        btn.disabled = done;
+        btn.innerText = done ? "✅ 已簽到" : "🎁 每日簽到";
+
+        btn.className = done
+          ? "bg-stone-200 text-stone-400 py-1 px-0.5 rounded-lg text-[10px] font-bold cursor-not-allowed border border-stone-200 flex flex-col items-center justify-center"
+          : "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 py-1 px-0.5 rounded-lg text-[10px] font-bold transition cursor-pointer border border-emerald-200 flex flex-col items-center justify-center";
+      }
+
+      function dailyCheckIn() {
+        if (isWorking || isSleeping) return;
+
+        const today = getTodayKey();
+
+        if (localStorage.getItem("dino_last_checkin") === today) {
+          document.getElementById("dinoSpeech").innerText =
+            "「今天已經簽到過囉！明天再來找我玩嘛～」";
+          return;
+        }
+
+        resetIdleTimer();
+
+        const roll = Math.random();
+        let message = "";
+
+        if (roll < 0.5) {
+          dinoStats.coins += 30;
+          message = "💰 簽到成功！獲得 30 元零用錢！";
+        } else if (roll < 0.7) {
+          dinoStats.bag.chicken = Math.min(
+            15,
+            (dinoStats.bag.chicken || 0) + 1,
+          );
+          message = "🍗 簽到成功！獲得雞排 ×1！";
+        } else if (roll < 0.85) {
+          dinoStats.bag.sprite = Math.min(15, (dinoStats.bag.sprite || 0) + 2);
+          message = "🥤 簽到成功！獲得雪碧 ×2！";
+        } else if (roll < 0.95) {
+          dinoStats.bag.salad = Math.min(15, (dinoStats.bag.salad || 0) + 3);
+          message = "🥗 簽到成功！獲得沙拉 ×3！";
+        } else {
+          dinoStats.coins += 100;
+          message = "🎁 超級幸運！簽到獲得 100 元！";
+        }
+
+        localStorage.setItem("dino_last_checkin", today);
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        localStorage.setItem("dino_bag", JSON.stringify(dinoStats.bag));
+
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+        document.getElementById("dinoSpeech").innerText = message;
+
+        updateBagUI();
+        updateCheckinButtonUI();
+      }
+
+      // ==================== 打工限定零食 ====================
+
+      const workSnacks = {
+        cookie: {
+          name: "恐龍餅乾",
+          emoji: "🍪",
+          description: "脆脆的恐龍造型餅乾。",
+          effects: { hunger: 15 },
+        },
+
+        cake: {
+          name: "主管蛋糕",
+          emoji: "🧁",
+          description: "吃了感覺工作都沒那麼討厭了。",
+          effects: { mood: 20 },
+        },
+
+        candy: {
+          name: "加班糖果",
+          emoji: "🍬",
+          description: "加班時最需要的一點甜。",
+          effects: { mood: 10, hunger: 5 },
+        },
+
+        chocolate: {
+          name: "摸魚巧克力",
+          emoji: "🍫",
+          description: "偷閒時吃起來特別幸福。",
+          effects: { mood: 15, thirst: 5 },
+        },
+
+        donut: {
+          name: "摸魚甜甜圈",
+          emoji: "🍩",
+          description: "今天不想工作的最佳夥伴。",
+          effects: { hunger: 30 },
+        },
+
+        biscuit: {
+          name: "薪水小餅乾",
+          emoji: "🥨",
+          description: "努力工作後得到的小獎勵。",
+          effects: { hunger: 10, mood: 10 },
+        },
+      };
+
+      // 獨立儲存，不影響原本商店背包
+      let workSnackBag = JSON.parse(
+        localStorage.getItem("dino_work_snacks") || "{}",
+      );
+
+      function saveWorkSnackBag() {
+        localStorage.setItem("dino_work_snacks", JSON.stringify(workSnackBag));
+      }
+
+      function getWorkSnackReward() {
+        // 30% 機率獲得零食
+        if (Math.random() >= 0.3) {
+          return null;
+        }
+
+        const snackKeys = Object.keys(workSnacks);
+        const randomKey =
+          snackKeys[Math.floor(Math.random() * snackKeys.length)];
+
+        workSnackBag[randomKey] = (workSnackBag[randomKey] || 0) + 1;
+
+        saveWorkSnackBag();
+
+        return workSnacks[randomKey];
+      }
+
+      function giveHug() {
+        if (isWorking || isSleeping) return;
+
+        resetIdleTimer();
+
+        dinoStats.mood = Math.min(100, dinoStats.mood + 10);
+
+        updateStatsUI();
+
+        document.getElementById("dinoSpeech").innerText =
+          "「抱抱充電成功！今天也要一起努力（或摸魚）喔！💕」";
+      }
+
+      function updateBagUI() {
+        // 一般食物
+        ["chicken", "sprite", "beer", "salad"].forEach((type) => {
+          const el = document.getElementById(`count_${type}`);
+          if (el) {
+            el.innerText = dinoStats.bag[type] || 0;
+          }
+        });
+
+        // 打工零食
+        Object.keys(workSnacks).forEach((type) => {
+          const el = document.getElementById(`count_${type}`);
+          if (el) {
+            el.innerText = workSnackBag[type] || 0;
+          }
+        });
+      }
+
+      function switchBagCategory(category) {
+        const foodSection = document.getElementById("bagFoodSection");
+        const snackSection = document.getElementById("bagSnackSection");
+
+        const foodTab = document.getElementById("bagTabFood");
+        const snackTab = document.getElementById("bagTabSnack");
+
+        selectedBagType = null;
+
+        if (category === "food") {
+          foodSection.classList.remove("hidden");
+          snackSection.classList.add("hidden");
+
+          foodTab.className =
+            "bg-[#94A684] text-white rounded-lg py-1 text-[10px] font-bold";
+
+          snackTab.className =
+            "bg-white text-[#7C7063] border border-[#EAE6DF] rounded-lg py-1 text-[10px] font-bold";
+        } else {
+          foodSection.classList.add("hidden");
+          snackSection.classList.remove("hidden");
+
+          snackTab.className =
+            "bg-[#94A684] text-white rounded-lg py-1 text-[10px] font-bold";
+
+          foodTab.className =
+            "bg-white text-[#7C7063] border border-[#EAE6DF] rounded-lg py-1 text-[10px] font-bold";
+        }
+
+        document.getElementById("dinoSpeech").innerText =
+          category === "food"
+            ? "「看看今天有什麼好吃的！」"
+            : "「這些都是我努力打工賺來的戰利品！」🍪";
+      }
+
+      function makeDinoSleep() {
+        if (isWorking) return;
+        isSleeping = true;
+        clearTimeout(idleTimer);
+        document.getElementById("dinoIcon").innerText = "💤";
+        document.getElementById("dinoSpeech").innerText =
+          "「Zzz... 主人放過我了，本恐龍先去夢裡躺平囉 🍃 (數值暫停消耗)」";
+        document.getElementById("dinoTitle").innerText = "狀態：午休中";
+      }
+
+      function punchAir() {
+        if (isWorking || isSleeping) return;
+        resetIdleTimer();
+        dinoStats.mood = Math.min(100, dinoStats.mood + 25);
+        dinoStats.hunger = Math.max(0, dinoStats.hunger - 5);
+        updateStatsUI();
+        document.getElementById("dinoSpeech").innerText =
+          "「哈！哈！把剛剛開會機車的主管想像成沙包，敲擊紓壓 🥊🔥」";
+      }
+
+      function takePaidPoop() {
+        if (isWorking || isSleeping) return;
+        resetIdleTimer();
+        dinoStats.mood = Math.min(100, dinoStats.mood + 30);
+        updateStatsUI();
+        document.getElementById("dinoSpeech").innerText =
+          "「帶著手機去蹲了 20 分鐘廁所... 帶薪大便真香！這段時間老闆還在付我薪水呢 ☕💩✨」";
+      }
+
+      function sendDinoToWork() {
+        if (isWorking || isSleeping) return;
+
+        if (
+          dinoStats.hunger < 30 ||
+          dinoStats.thirst < 30 ||
+          dinoStats.mood < 30
+        ) {
+          document.getElementById("dinoSpeech").innerText =
+            "⟨本恐龍目前狀態太差了！快餵我吃東西或休息啦！💢⟩";
+          return;
+        }
+
+        document.getElementById("dinoSpeech").innerHTML = `
+    <div class="flex flex-col gap-1 w-full">
+      <span class="text-[10px] font-bold">💼 選擇打工項目：</span>
+
+      <div class="grid grid-cols-3 gap-1">
+
+        <button onclick="startWork(60, '半天工', event)"
+          class="bg-stone-100 hover:bg-stone-200 rounded p-1 text-[9px]">
+          1分<br>半天工
+        </button>
+
+        <button onclick="startWork(180, '通宵加班', event)"
+          class="bg-stone-100 hover:bg-stone-200 rounded p-1 text-[9px]">
+          3分<br>通宵加班
+        </button>
+
+        <button onclick="startWork(600, '出差', event)"
+          class="bg-stone-100 hover:bg-stone-200 rounded p-1 text-[9px]">
+          10分<br>出差
+        </button>
+
+        <button onclick="startWork(900, '辦公室大掃除', event)"
+          class="bg-emerald-50 hover:bg-emerald-100 rounded p-1 text-[9px]">
+          15分<br>大掃除
+        </button>
+
+        <button onclick="startWork(1800, '倉庫整理', event)"
+          class="bg-emerald-50 hover:bg-emerald-100 rounded p-1 text-[9px]">
+          30分<br>倉庫整理
+        </button>
+
+        <button onclick="startWork(3600, '系統維護專案', event)"
+          class="bg-emerald-50 hover:bg-emerald-100 rounded p-1 text-[9px]">
+          60分<br>系統維護
+        </button>
+
+      </div>
+    </div>
+  `;
+      }
+
+      function startWork(durationSeconds, workTypeName, event) {
+        if (event) event.stopPropagation();
+        localStorage.setItem(
+          "dino_work_finish",
+          Date.now() + durationSeconds * 1000,
+        );
+        localStorage.setItem("dino_work_type", workTypeName);
+        isWorking = true;
+        updateWorkStateUI();
+      }
+
+      function updateWorkStateUI() {
+        const finishTime = parseInt(localStorage.getItem("dino_work_finish"));
+
+        if (!finishTime) return;
+
+        const timeLeft = Math.ceil((finishTime - Date.now()) / 1000);
+        const workBtn = document.getElementById("workBtn");
+
+        if (timeLeft > 0) {
+          isWorking = true;
+
+          if (workBtn) {
+            workBtn.disabled = true;
+            workBtn.innerText = `💼 (${timeLeft}秒)`;
+          }
+
+          document.getElementById("dinoIcon").innerText = "💼";
+          document.getElementById("dinoSpeech").innerText =
+            `⟨打工中... 剩餘 ${timeLeft} 秒 💼⟩`;
+
+          setTimeout(updateWorkStateUI, 1000);
+        } else {
+          // 先取得工作種類，不能先刪除！
+          const workType = localStorage.getItem("dino_work_type") || "半天工";
+
+          // 各種工作的報酬範圍
+          const workRewards = {
+            半天工: [15, 34],
+            通宵加班: [15, 34],
+            出差: [15, 34],
+            辦公室大掃除: [40, 60],
+            倉庫整理: [70, 100],
+            系統維護專案: [120, 160],
+          };
+
+          const [minReward, maxReward] = workRewards[workType] || [15, 34];
+
+          const earned =
+            Math.floor(Math.random() * (maxReward - minReward + 1)) + minReward;
+
+          // 發放金幣
+          dinoStats.coins += earned;
+
+          localStorage.setItem("dino_coins", dinoStats.coins);
+
+          document.getElementById("coinCount").innerText = dinoStats.coins;
+
+          // 額外零食獎勵
+          const bonusSnack = getWorkSnackReward();
+
+          let resultMessage = `⟨打工回來！完成「${workType}」，賺了 ${earned} 元！🎉⟩`;
+
+          if (bonusSnack) {
+            resultMessage += `\n🍪 意外獲得 ${bonusSnack.emoji}${bonusSnack.name}！`;
+          } else {
+            resultMessage += "\n今天沒有找到額外零食，下次再加油！";
+          }
+
+          // 顯示打工結果
+          document.getElementById("dinoSpeech").innerText = resultMessage;
+
+          // 恢復恐龍狀態
+          isWorking = false;
+
+          document.getElementById("dinoIcon").innerText = currentPetEmoji;
+
+          // 恢復打工按鈕
+          if (workBtn) {
+            workBtn.disabled = false;
+            workBtn.innerText = "💼 派打工";
+          }
+
+          // 更新數值及閒置計時器
+          updateStatsUI();
+          resetIdleTimer();
+
+          // 最後才清除打工紀錄
+          localStorage.removeItem("dino_work_finish");
+          localStorage.removeItem("dino_work_type");
+        }
+      }
+
+      function updateStatsUI() {
+        document.getElementById("hungerBar").style.width =
+          dinoStats.hunger + "%";
+        document.getElementById("hungerText").innerText =
+          dinoStats.hunger + "%";
+        document.getElementById("thirstBar").style.width =
+          dinoStats.thirst + "%";
+        document.getElementById("thirstText").innerText =
+          dinoStats.thirst + "%";
+        document.getElementById("moodBar").style.width = dinoStats.mood + "%";
+        document.getElementById("moodText").innerText = dinoStats.mood + "%";
+
+        const iconEl = document.getElementById("dinoIcon");
+        const titleEl = document.getElementById("dinoTitle");
+
+        if (isSleeping || isWorking) return;
+
+        if (dinoStats.hunger < 30) {
+          iconEl.innerText = "🍖";
+          titleEl.innerText = "狀態：餓扁了！";
+        } else if (dinoStats.thirst < 30) {
+          iconEl.innerText = "🥤";
+          titleEl.innerText = "狀態：口乾舌燥";
+        } else if (dinoStats.mood < 30) {
+          iconEl.innerText = "💢";
+          titleEl.innerText = "狀態：森七七";
+        } else {
+          iconEl.innerText = currentPetEmoji;
+          titleEl.innerText = "狀態：正常運轉";
+        }
+      }
+
+      setInterval(() => {
+        if (!isSleeping && !isWorking) {
+          const dropRate = 5;
+          dinoStats.hunger = Math.max(0, dinoStats.hunger - dropRate);
+          dinoStats.thirst = Math.max(0, dinoStats.thirst - dropRate);
+          dinoStats.mood = Math.max(0, dinoStats.mood - dropRate);
+          updateStatsUI();
+        }
+      }, 15000);
+
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+      }
+
+      function wakeUpDino() {
+        isSleeping = false;
+        updateStatsUI();
+        document.getElementById("dinoSpeech").innerText =
+          "⟨啊！我醒了！繼續對抗老闆的急件！🔥⟩";
+        resetIdleTimer();
+      }
+
+      let unlockedPets = JSON.parse(
+        localStorage.getItem("dino_unlocked_pets"),
+      ) || {
+        dino: true,
+        boss: false,
+        cat: false,
+        rabbit: false,
+        seal: false,
+        frog: false,
+        panda: false,
+        pigeon: false,
+      };
+      let currentPetEmoji = localStorage.getItem("dino_current_pet") || "🦖";
+
+      function buyOrEquipPet(petKey, emoji, price) {
+        resetIdleTimer();
+        if (unlockedPets[petKey]) {
+          equipPet(petKey, emoji);
+        } else {
+          if (dinoStats.coins < price) {
+            document.getElementById("dinoSpeech").innerText =
+              `⟨金幣不足 $${price}！⟩`;
+            return;
+          }
+          dinoStats.coins -= price;
+          unlockedPets[petKey] = true;
+          localStorage.setItem("dino_coins", dinoStats.coins);
+          localStorage.setItem(
+            "dino_unlocked_pets",
+            JSON.stringify(unlockedPets),
+          );
+          document.getElementById("coinCount").innerText = dinoStats.coins;
+          equipPet(petKey, emoji);
+          document.getElementById("dinoSpeech").innerText =
+            `⟨🎉 解鎖夥伴【${emoji}】成功！⟩`;
+        }
+      }
+
+      function equipPet(petKey, emoji) {
+        currentPetEmoji = emoji;
+        localStorage.setItem("dino_current_pet", emoji);
+        document.getElementById("dinoIcon").innerText = emoji;
+        updatePetStoreUI();
+      }
+
+      function updatePetStoreUI() {
+        const pets = [
+          "boss",
+          "cat",
+          "rabbit",
+          "seal",
+          "frog",
+          "panda",
+          "pigeon",
+        ];
+        const prices = {
+          boss: 100,
+          cat: 250,
+          rabbit: 350,
+          seal: 500,
+          frog: 600,
+          panda: 800,
+          pigeon: 1000,
+        };
+        const emojis = {
+          boss: "👔",
+          cat: "🐱",
+          rabbit: "🐰",
+          seal: "🦭",
+          frog: "🐸",
+          panda: "🐼",
+          pigeon: "🕊️",
+        };
+
+        const dinoBtn = document.getElementById("btn_pet_dino");
+        if (dinoBtn) {
+          dinoBtn.innerText = currentPetEmoji === "🦖" ? "使用中" : "裝備";
+          dinoBtn.className =
+            currentPetEmoji === "🦖"
+              ? "bg-stone-300 text-stone-600 px-2 py-0.5 rounded font-bold cursor-default"
+              : "bg-[#94A684] text-white px-2 py-0.5 rounded font-bold cursor-pointer";
+        }
+
+        pets.forEach((p) => {
+          const btn = document.getElementById(`btn_pet_${p}`);
+          if (!btn) return;
+          if (unlockedPets[p]) {
+            btn.innerText = currentPetEmoji === emojis[p] ? "使用中" : "裝備";
+            btn.className =
+              currentPetEmoji === emojis[p]
+                ? "bg-stone-300 text-stone-600 px-2 py-0.5 rounded font-bold cursor-default"
+                : "bg-[#94A684] text-white px-2 py-0.5 rounded font-bold cursor-pointer";
+          } else {
+            btn.innerText = `購買($${prices[p]})`;
+            btn.className =
+              "bg-[#54B4D3] text-white px-2 py-0.5 rounded font-bold cursor-pointer";
+          }
+        });
+      }
+
+      // ==================== 寵物商城介紹 ====================
+
+      function showPetInfo(petKey) {
+        const petInfo = {
+          dino: {
+            emoji: "🦖",
+            name: "經典小恐龍",
+            description:
+              "最初陪伴你的夥伴，活潑又貪吃，是辦公室裡最可愛的小恐龍！",
+          },
+          boss: {
+            emoji: "👔",
+            name: "暴龍主管",
+            description:
+              "重視 KPI、熱愛開會，隨時準備檢查你的工作進度。小心不要被盯上！",
+          },
+          cat: {
+            emoji: "🐱",
+            name: "加班貓貓",
+            description:
+              "表面上很厭世，實際上超愛被寵。最討厭加班，最喜歡罐罐！",
+          },
+          rabbit: {
+            emoji: "🐰",
+            name: "咖啡因兔",
+            description: "活力滿滿的咖啡愛好者，喝完咖啡就能繼續蹦蹦跳跳！",
+          },
+          seal: {
+            emoji: "🦭",
+            name: "摸魚海豹",
+            description: "人生目標就是躺平，最擅長把休息時間延長到最大值。",
+          },
+          frog: {
+            emoji: "🐸",
+            name: "工程師蛙",
+            description:
+              "精通 Debug 與程式語言，遇到 Bug 會先呱一聲再開始除錯。",
+          },
+          panda: {
+            emoji: "🐼",
+            name: "熊貓會計",
+            description: "精打細算、重視預算，每一筆金幣都要仔細記帳。",
+          },
+          pigeon: {
+            emoji: "🕊️",
+            name: "躺平鴿子",
+            description: "自由自在的佛系代表，不追求升遷，只想優雅地放空。",
+          },
+        };
+
+        const pet = petInfo[petKey];
+        if (!pet) return;
+
+        // 修正了原本模板字串的語法（加上了反引號 `）
+        document.getElementById("dinoSpeech").innerText =
+          `${pet.emoji} ${pet.name}\n${pet.description}`;
+      }
+
+      function changeFoodQty(type, delta) {
+        resetIdleTimer();
+        const input = document.getElementById(`${type}Qty`);
+        input.value = Math.min(
+          15,
+          Math.max(1, (parseInt(input.value) || 1) + delta),
+        );
+      }
+
+      function buyMarketItem(type) {
+        resetIdleTimer();
+        const amount =
+          parseInt(document.getElementById(`${type}Qty`).value) || 1;
+        const prices = { chicken: 20, sprite: 15, beer: 15, salad: 5 };
+        const cost = prices[type] * amount;
+
+        if ((dinoStats.bag[type] || 0) + amount > 15) {
+          document.getElementById("dinoSpeech").innerText =
+            `⟨⚠️ 背包空間不足（上限 15 個）！⟩`;
+          return;
+        }
+        if (dinoStats.coins < cost) {
+          document.getElementById("dinoSpeech").innerText =
+            `⟨金幣不足 $${cost}！⟩`;
+          return;
+        }
+
+        dinoStats.coins -= cost;
+        dinoStats.bag[type] = (dinoStats.bag[type] || 0) + amount;
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        localStorage.setItem("dino_bag", JSON.stringify(dinoStats.bag));
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+        updateBagUI();
+        document.getElementById("dinoSpeech").innerText =
+          `⟨成功批次購入 ${amount} 個！已塞入背包 🎒✨⟩`;
+      }
+
+      let stockMarket = {
+        bbt: {
+          price: 10,
+          holding: parseInt(localStorage.getItem("stock_bbt_holding")) || 0,
+          totalCost: parseInt(localStorage.getItem("stock_bbt_cost")) || 0,
+        },
+        pto: {
+          price: 25,
+          holding: parseInt(localStorage.getItem("stock_pto_holding")) || 0,
+          totalCost: parseInt(localStorage.getItem("stock_pto_cost")) || 0,
+        },
+        crash: {
+          price: 50,
+          holding: parseInt(localStorage.getItem("stock_crash_holding")) || 0,
+          totalCost: parseInt(localStorage.getItem("stock_crash_cost")) || 0,
+        },
+        ot: {
+          price: 5,
+          holding: parseInt(localStorage.getItem("stock_ot_holding")) || 0,
+          totalCost: parseInt(localStorage.getItem("stock_ot_cost")) || 0,
+        },
+      };
+
+      setInterval(() => {
+        if (isSleeping) return;
+        stockMarket.bbt.price = Math.max(
+          3,
+          stockMarket.bbt.price + (Math.floor(Math.random() * 6) - 3),
+        );
+        stockMarket.pto.price = Math.max(
+          3,
+          stockMarket.pto.price + (Math.floor(Math.random() * 31) - 15),
+        );
+        stockMarket.crash.price = Math.max(
+          10,
+          stockMarket.crash.price + (Math.floor(Math.random() * 56) - 25),
+        );
+        stockMarket.ot.price = Math.max(
+          2,
+          stockMarket.ot.price + (Math.floor(Math.random() * 4) - 1),
+        );
+        updateStockUI();
+      }, 12000);
+
+      function changeStockQty(type, delta) {
+        resetIdleTimer();
+        const input = document.getElementById(`${type}Qty`);
+        input.value = Math.min(
+          50,
+          Math.max(1, (parseInt(input.value) || 1) + delta),
+        );
+      }
+
+      function buyStock(type) {
+        resetIdleTimer();
+        const amount =
+          parseInt(document.getElementById(`${type}Qty`).value) || 1;
+        const stock = stockMarket[type];
+        const cost =
+          stock.price * amount + Math.ceil(stock.price * amount * 0.05);
+
+        if (dinoStats.coins < cost) {
+          document.getElementById("dinoSpeech").innerText =
+            `⟨金幣不足 $${cost}！⟩`;
+          return;
+        }
+        dinoStats.coins -= cost;
+        stock.holding += amount;
+        stock.totalCost += stock.price * amount;
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        localStorage.setItem(`stock_${type}_holding`, stock.holding);
+        localStorage.setItem(`stock_${type}_cost`, stock.totalCost);
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+        updateStockUI();
+      }
+
+      function sellStock(type) {
+        resetIdleTimer();
+        const amount =
+          parseInt(document.getElementById(`${type}Qty`).value) || 1;
+        const stock = stockMarket[type];
+        if (stock.holding < amount) {
+          document.getElementById("dinoSpeech").innerText = `⟨持有張數不足！⟩`;
+          return;
+        }
+        const avgCost = stock.holding > 0 ? stock.totalCost / stock.holding : 0;
+        stock.holding -= amount;
+        stock.totalCost = Math.max(0, stock.totalCost - avgCost * amount);
+        dinoStats.coins += stock.price * amount;
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        localStorage.setItem(`stock_${type}_holding`, stock.holding);
+        localStorage.setItem(`stock_${type}_cost`, stock.totalCost);
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+        updateStockUI();
+      }
+
+      function updateStockUI() {
+        ["bbt", "pto", "crash", "ot"].forEach((type) => {
+          const stock = stockMarket[type];
+          const avgCost =
+            stock.holding > 0 ? Math.round(stock.totalCost / stock.holding) : 0;
+          const profit = stock.price * stock.holding - stock.totalCost;
+          document.getElementById(`${type}Price`).innerText =
+            `($${stock.price})`;
+          document.getElementById(`${type}Holding`).innerText = stock.holding;
+          document.getElementById(`${type}Avg`).innerText = avgCost;
+          const pEl = document.getElementById(`${type}Profit`);
+          pEl.innerText =
+            stock.holding === 0
+              ? `$0`
+              : profit >= 0
+                ? `+$${profit}`
+                : `-$${Math.abs(profit)}`;
+          pEl.className =
+            stock.holding === 0
+              ? "font-bold text-[#8C7E70]"
+              : profit >= 0
+                ? "font-bold text-emerald-600"
+                : "font-bold text-rose-500";
+        });
+      }
+
+      function switchDinoTab(tabName) {
+        // 1. 隱藏所有功能面板
+        const panels = [
+          "panelStats",
+          "panelFeed",
+          "panelAction",
+          "panelMarket",
+          "panelStock",
+        ];
+
+        panels.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.add("hidden");
+        });
+
+        // 2. 重置所有分頁按鈕
+        const tabs = [
+          "tabStats",
+          "tabFeed",
+          "tabAction",
+          "tabMarket",
+          "tabStock",
+        ];
+
+        tabs.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.className =
+              "bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center";
+          }
+        });
+
+        // 3. 顯示指定面板
+        const map = {
+          stats: "panelStats",
+          feed: "panelFeed",
+          action: "panelAction",
+          market: "panelMarket",
+          stock: "panelStock",
+        };
+
+        const tMap = {
+          stats: "tabStats",
+          feed: "tabFeed",
+          action: "tabAction",
+          market: "tabMarket",
+          stock: "tabStock",
+        };
+
+        const targetPanel = document.getElementById(map[tabName]);
+
+        if (targetPanel) {
+          targetPanel.classList.remove("hidden");
+        }
+
+        // 4. 高亮目前分頁
+        const targetTab = document.getElementById(tMap[tabName]);
+
+        if (targetTab) {
+          targetTab.className =
+            "bg-[#94A684] text-white py-1.5 rounded-lg text-[10px] font-bold transition shadow-sm cursor-pointer flex flex-col items-center";
+        }
+
+        // 5. 離開背包時恢復預設狀態
+        if (tabName !== "feed") {
+          selectedBagType = null;
+
+          // 恢復所有道具格子的原始樣式
+          ["chicken", "sprite", "beer", "salad"].forEach((t) => {
+            const slot = document.getElementById(`slot_${t}`);
+            if (slot) {
+              slot.className =
+                "relative bg-white hover:bg-[#F5F2EB] p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center transition select-none";
+            }
+          });
+
+          // 恢復恐龍預設對話
+          document.getElementById("dinoSpeech").innerText =
+            "「吼——（隕石來啦!🔥）」";
+        }
+      }
+
+      function switchMarketSubTab(subName) {
+        ["subPanelFood", "subPanelGame", "subPanelPet"].forEach((p) => {
+          const el = document.getElementById(p);
+          if (el) el.classList.add("hidden");
+        });
+        ["subTabFood", "subTabGame", "subTabPet"].forEach((t) => {
+          const el = document.getElementById(t);
+          if (el) el.className = "market-tab-btn flex-1 text-center";
+        });
+
+        if (subName === "food") {
+          document.getElementById("subPanelFood").classList.remove("hidden");
+          document.getElementById("subTabFood").className =
+            "market-tab-btn active flex-1 text-center";
+        }
+        if (subName === "game") {
+          document.getElementById("subPanelGame").classList.remove("hidden");
+          document.getElementById("subTabGame").className =
+            "market-tab-btn active flex-1 text-center";
+        }
+        if (subName === "pet") {
+          document.getElementById("subPanelPet").classList.remove("hidden");
+          document.getElementById("subTabPet").className =
+            "market-tab-btn active flex-1 text-center";
+          updatePetStoreUI();
+        }
+      }
+
+      let isMinimized = false;
+      function toggleDinoMinimize() {
+        isMinimized = !isMinimized;
+        const card = document.getElementById("dinoCard");
+        card.classList.toggle("minimized", isMinimized);
+        document
+          .getElementById("dinoExpandedBody")
+          .classList.toggle("hidden", isMinimized);
+        document.getElementById("minimizeIcon").className = isMinimized
+          ? "fa-solid fa-plus text-[9px]"
+          : "fa-solid fa-minus text-[9px]";
+      }
+
+      function toggleSettingsMenu(e) {
+        if (e) e.stopPropagation();
+        document.getElementById("settingsMenu").classList.toggle("hidden");
+      }
+      window.onclick = () => {
+        const menu = document.getElementById("settingsMenu");
+        if (menu) menu.classList.add("hidden");
+      };
+      function openDinoHelpModal() {
+        document.getElementById("dinoHelpModal").classList.remove("hidden");
+      }
+      function closeDinoHelpModal() {
+        document.getElementById("dinoHelpModal").classList.add("hidden");
+      }
+
+      function exportData() {
+        const data = {
+          coins: dinoStats.coins,
+          hunger: dinoStats.hunger,
+          thirst: dinoStats.thirst,
+          mood: dinoStats.mood,
+          bag: dinoStats.bag,
+          unlocked_pets: unlockedPets,
+          current_pet: currentPetEmoji,
+        };
+        const blob = new Blob(
+          ["var localDinoData = " + JSON.stringify({ data }) + ";"],
+          { type: "text/plain;charset=utf-8" },
+        );
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "dino_data.txt";
+        a.click();
+      }
+
+      let selectedBagType = null;
+
+      function selectBagItem(type) {
+        if (isWorking || isSleeping) return;
+
+        resetIdleTimer();
+
+        selectedBagType = type;
+
+        const foodTypes = ["chicken", "sprite", "beer", "salad"];
+        const snackTypes = Object.keys(workSnacks);
+
+        [...foodTypes, ...snackTypes].forEach((t) => {
+          const slot = document.getElementById(`slot_${t}`);
+
+          if (slot) {
+            slot.className =
+              "relative bg-white hover:bg-[#F5F2EB] p-1.5 rounded-lg border border-[#EAE6DF] cursor-pointer flex flex-col items-center justify-center transition select-none";
+          }
+        });
+
+        const activeSlot = document.getElementById(`slot_${type}`);
+
+        if (activeSlot) {
+          activeSlot.className =
+            "relative bg-[#EAE6DF] p-1.5 rounded-lg border-2 border-[#94A684] cursor-pointer flex flex-col items-center justify-center transition select-none shadow-xs";
+        }
+
+        let itemDesc = "";
+
+        // 一般食物
+        if (foodTypes.includes(type)) {
+          const count = dinoStats.bag[type] || 0;
+
+          if (type === "chicken")
+            itemDesc = `🍗 豪華炸雞排（有：${count}）<br>飢餓 +40%、口渴 -5%`;
+
+          if (type === "sprite")
+            itemDesc = `🧊 冰涼雪碧（有：${count}）<br>口渴 +35%、心情 +15%`;
+
+          if (type === "beer")
+            itemDesc = `🍺 生啤酒（有：${count}）<br>口渴 +20%、心情 +40%`;
+
+          if (type === "salad")
+            itemDesc = `🥗 輕沙拉（有：${count}）<br>飢餓 +15%、心情 -10%`;
+        } else {
+          // 打工零食
+          const snack = workSnacks[type];
+          const count = workSnackBag[type] || 0;
+
+          const effectNames = {
+            hunger: "飢餓",
+            thirst: "口渴",
+            mood: "心情",
+          };
+
+          const effectText = Object.entries(snack.effects)
+            .map(([key, value]) => {
+              return `${effectNames[key]} +${value}%`;
+            })
+            .join("、");
+
+          itemDesc = `${snack.emoji} ${snack.name}（有：${count}）<br>${effectText}`;
+        }
+
+        document.getElementById("dinoSpeech").innerHTML = `
+    <div class="flex items-center w-full gap-2">
+      <span class="text-[10px] text-[#5C5247] font-medium flex-1 min-w-0 whitespace-normal break-words leading-relaxed">
+        ${itemDesc}
+      </span>
+
+      <button onclick="useSelectedBagItem()"
+        class="bg-[#94A684] hover:bg-[#839573] text-white px-2 py-1 rounded text-[9px] font-bold cursor-pointer shrink-0 shadow-xs">
+        立即使用
+      </button>
+    </div>
+  `;
+      }
+
+      // 🦖 不同寵物吃不同食物的專屬反應
+      function getPetFoodReaction(petEmoji, foodType) {
+        const reactions = {
+          // 🦖 經典小恐龍：貪吃、傲嬌、肉食主義
+          "🦖": {
+            chicken: "終於吃到肉了！這才是恐龍該有的待遇！",
+            sprite: "嗝～～冰冰涼涼的！這才是上班日的續命神器！",
+            beer: "乾啦！！今天的委屈都隨著酒精蒸發了！",
+            salad: "蛤？又是菜菜？本恐龍是肉食性動物欸！森七七啦！🥬💢",
+          },
+
+          // 👔 暴龍主管：嚴格、重視 KPI
+          "👔": {
+            chicken: "蛋白質補充完成！本日體力 KPI 達標！",
+            sprite: "補水效率不錯，這才是有生產力的員工！",
+            beer: "喝酒可以，但明天的進度報告不准遲交！",
+            salad: "飲食管理做得不錯，但這份伙食預算還能再壓低一點。",
+          },
+
+          // 🐱 加班貓貓：傲嬌、愛吃
+          "🐱": {
+            chicken: "喵！這個還不錯，不過有罐罐的話就更好了！",
+            sprite: "冰冰的好舒服喵～再來一杯也不是不行！",
+            beer: "喵？這是什麼味道？算了，本喵心情好多了！",
+            salad: "蛤？本喵是貓欸！你看過哪隻貓想吃菜菜？",
+          },
+
+          // 🐰 咖啡因兔：活力滿滿
+          "🐰": {
+            chicken: "好吃好吃！吃飽才有力氣繼續蹦蹦跳！",
+            sprite: "咕嚕咕嚕！冰冰涼涼，兔兔充電成功！",
+            beer: "咦？怎麼有點暈？兔兔需要的是咖啡啦！",
+            salad: "菜菜也不錯！兔兔最喜歡蹦蹦跳跳的健康生活！",
+          },
+
+          // 🦭 摸魚海豹：懶散、愛躺平
+          "🦭": {
+            chicken: "嗷嗚～吃飽就想睡了，今天可以不用工作嗎？",
+            sprite: "冰冰的好舒服！可以順便幫我拿個冰枕嗎？",
+            beer: "乾杯！喝完就躺平，人生沒有比這更重要的事了！",
+            salad: "菜菜也可以啦……但吃完可以讓我繼續睡嗎？",
+          },
+
+          // 🐸 工程師蛙：理性、程式梗
+          "🐸": {
+            chicken: "Energy += 40; 飢餓值更新成功，系統正常運作。",
+            sprite: "補水程序執行成功！心情 Buff 也順利載入。",
+            beer: "警告：酒精可能影響系統穩定性，但心情模組已更新。",
+            salad: "收到蔬菜資料，正在重新計算……蛙蛙不太滿意。",
+          },
+
+          // 🐼 熊貓會計：精打細算
+          "🐼": {
+            chicken: "雞排 $20？已列入伙食費，記得保留發票喔！",
+            sprite: "雪碧 $15？嗯……這筆支出還在預算範圍內。",
+            beer: "這筆娛樂支出要記在哪個科目？先不要讓主管知道。",
+            salad: "沙拉 $5！太棒了！本月伙食費成功節省！",
+          },
+
+          // 🕊️ 躺平鴿子：佛系、厭世
+          "🕊️": {
+            chicken: "吃吧吃吧，反正人生就是吃飽睡、睡飽吃。",
+            sprite: "咕咕～人生需要一點冰涼，不需要太多努力。",
+            beer: "喝一口，忘記煩惱。明天的事明天再說吧。",
+            salad: "菜菜也好，肉肉也好，反正最後都是要躺平。",
+          },
+        };
+
+        return reactions[petEmoji]?.[foodType] || "嗯嗯～吃飽了，繼續摸魚！";
+      }
+
+      function useBagItem(type) {
+        if (isWorking || isSleeping) return;
+
+        resetIdleTimer();
+
+        const isSnack = !!workSnacks[type];
+
+        // 檢查數量
+        const count = isSnack
+          ? workSnackBag[type] || 0
+          : dinoStats.bag[type] || 0;
+
+        if (count <= 0) {
+          document.getElementById("dinoSpeech").innerText = isSnack
+            ? "⟨這個零食已經吃完了！下次打工再努力帶回來吧！🍪⟩"
+            : "⟨背包裡沒有這個食物了！快去商場買一點囤貨吧！🛒⟩";
+
+          return;
+        }
+
+        let itemName = "";
+        let effects = [];
+        let dinoReaction = "";
+
+        // ====================
+        // 打工限定零食
+        // ====================
+
+        if (isSnack) {
+          const snack = workSnacks[type];
+
+          itemName = `${snack.emoji} ${snack.name}`;
+
+          workSnackBag[type]--;
+
+          // 套用效果
+          Object.entries(snack.effects).forEach(([key, value]) => {
+            dinoStats[key] = Math.min(100, dinoStats[key] + value);
+
+            const effectNames = {
+              hunger: "飢餓",
+              thirst: "口渴",
+              mood: "心情",
+            };
+
+            effects.push({
+              name: effectNames[key],
+              value: `+${value}%`,
+            });
+          });
+
+          saveWorkSnackBag();
+
+          const snackReactions = {
+            cookie: "「咔滋咔滋！恐龍餅乾真的超好吃！」🍪",
+            cake: "「主管蛋糕？今天終於有主管請客了！」🧁",
+            candy: "「甜甜的！加班的疲勞瞬間消失！」🍬",
+            chocolate: "「摸魚時間配巧克力，簡直完美！」🍫",
+            donut: "「這個甜甜圈我要慢慢享受！」🍩",
+            biscuit: "「這是我努力工作的證明！」🥨",
+          };
+
+          dinoReaction = snackReactions[type];
+        } else {
+          // ====================
+          // 原本一般食物
+          // ====================
+
+          dinoStats.bag[type]--;
+
+          localStorage.setItem("dino_bag", JSON.stringify(dinoStats.bag));
+
+          if (type === "chicken") {
+            itemName = "🍗 雞排";
+
+            dinoStats.hunger = Math.min(100, dinoStats.hunger + 40);
+            dinoStats.thirst = Math.max(0, dinoStats.thirst - 5);
+
+            effects = [
+              { name: "飢餓", value: "+40%" },
+              { name: "口渴", value: "-5%" },
+            ];
+          } else if (type === "sprite") {
+            itemName = "🧊 雪碧";
+
+            dinoStats.thirst = Math.min(100, dinoStats.thirst + 35);
+            dinoStats.mood = Math.min(100, dinoStats.mood + 15);
+
+            effects = [
+              { name: "口渴", value: "+35%" },
+              { name: "心情", value: "+15%" },
+            ];
+          } else if (type === "salad") {
+            itemName = "🥗 沙拉";
+
+            dinoStats.hunger = Math.min(100, dinoStats.hunger + 15);
+            dinoStats.mood = Math.max(0, dinoStats.mood - 10);
+
+            effects = [
+              { name: "飢餓", value: "+15%" },
+              { name: "心情", value: "-10%" },
+            ];
+          } else if (type === "beer") {
+            itemName = "🍺 啤酒";
+
+            dinoStats.thirst = Math.min(100, dinoStats.thirst + 20);
+            dinoStats.mood = Math.min(100, dinoStats.mood + 40);
+
+            effects = [
+              { name: "口渴", value: "+20%" },
+              { name: "心情", value: "+40%" },
+            ];
+          }
+
+          // 保留原本八隻恐龍的專屬反應
+          dinoReaction = getPetFoodReaction(currentPetEmoji, type);
+        }
+
+        // 更新背包及數值
+        updateBagUI();
+        updateStatsUI();
+
+        // 顯示使用結果
+        const speechEl = document.getElementById("dinoSpeech");
+
+        const effectHTML = effects
+          .map((effect) => {
+            const isPositive = effect.value.startsWith("+");
+
+            const color = isPositive ? "text-emerald-600" : "text-rose-500";
+
+            return `
+      <span class="${color} font-bold whitespace-nowrap">
+        ${effect.name} ${effect.value}
+      </span>
+    `;
+          })
+          .join("");
+
+        const remaining = isSnack ? workSnackBag[type] : dinoStats.bag[type];
+
+        speechEl.innerHTML = `
+    <div class="flex flex-col gap-1 w-full">
+
+      <span class="text-emerald-700 font-bold text-[10px]">
+        ✨ 使用${itemName}成功！
+      </span>
+
+      <span class="text-[10px] text-[#8C7E70] leading-relaxed">
+        ${dinoReaction}
+      </span>
+
+      <div class="flex items-center justify-between gap-1 w-full">
+
+        <div class="flex flex-wrap gap-x-2 gap-y-0.5 text-[10px] min-w-0">
+          ${effectHTML}
+        </div>
+
+        <span class="text-[9px] text-[#8C7E70] font-bold whitespace-nowrap shrink-0">
+          🎒 剩餘：${remaining} 個
+        </span>
+
+      </div>
+    </div>
+  `;
+      }
+
+      function useSelectedBagItem() {
+        if (!selectedBagType) return;
+        useBagItem(selectedBagType);
+      }
+
+      function importData(e) {
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          try {
+            let json = evt.target.result
+              .replace("var localDinoData =", "")
+              .trim();
+            if (json.endsWith(";")) json = json.slice(0, -1);
+            const parsed = JSON.parse(json).data;
+            if (parsed.coins !== undefined) dinoStats.coins = parsed.coins;
+            localStorage.setItem("dino_coins", dinoStats.coins);
+            alert("匯入成功！");
+            location.reload();
+          } catch (err) {
+            alert("格式錯誤");
+          }
+        };
+        reader.readAsText(e.target.files[0]);
+      }
+
+      function playCoinFlip() {
+        resetIdleTimer();
+        if (dinoStats.coins < 10) {
+          document.getElementById("dinoSpeech").innerText =
+            "⟨金幣不足 $10，無法玩硬幣連莊！🪙⟩";
+          return;
+        }
+        dinoStats.coins -= 10;
+        const win = Math.random() < 0.5;
+        if (win) {
+          dinoStats.coins += 25;
+          document.getElementById("dinoSpeech").innerText =
+            "🪙 硬幣連莊中獎！賺了 25 塊錢 🎉";
+        } else {
+          document.getElementById("dinoSpeech").innerText =
+            "🪙 哎呀... 硬幣猜錯了，輸掉 10 塊錢 💧";
+        }
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+      }
+
+      function playSlotMachine() {
+        resetIdleTimer();
+        if (dinoStats.coins < 25) {
+          document.getElementById("dinoSpeech").innerText =
+            "⟨金幣不足 $25，買不起珍奶拉霸！🧋⟩";
+          return;
+        }
+        dinoStats.coins -= 25;
+        const roll = Math.random();
+        if (roll < 0.1) {
+          dinoStats.coins += 100;
+          document.getElementById("dinoSpeech").innerText =
+            "🧋✨ 幸運大爆發！珍奶連線成功，贏得 100 塊大獎！";
+        } else if (roll < 0.4) {
+          dinoStats.coins += 40;
+          document.getElementById("dinoSpeech").innerText =
+            "🧋 中獎！獲得半糖珍奶一杯及 40 塊！";
+        } else {
+          document.getElementById("dinoSpeech").innerText =
+            "🧋 沒中... 珍奶都被主管喝光了 🥲";
+        }
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+      }
+
+      function playBossFistGame() {
+        resetIdleTimer();
+        if (dinoStats.coins < 15) {
+          document.getElementById("dinoSpeech").innerText =
+            "⟨金幣不足 $15，無法挑戰主管！🥊⟩";
+          return;
+        }
+        dinoStats.coins -= 15;
+        const results = ["win", "lose", "draw"];
+        const res = results[Math.floor(Math.random() * results.length)];
+        if (res === "win") {
+          dinoStats.coins += 45;
+          document.getElementById("dinoSpeech").innerText =
+            "🥊 你出了石頭，主管出了剪刀！你贏了 45 塊獎金！🏆";
+        } else if (res === "lose") {
+          document.getElementById("dinoSpeech").innerText =
+            "🥊 主管出了布，你被記警告一次... 輸掉 15 塊錢 😭";
+        } else {
+          dinoStats.coins += 15;
+          document.getElementById("dinoSpeech").innerText =
+            "🥊 平手！拿回本金 15 塊錢 🤝";
+        }
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+      }
+
+      function playGashapon() {
+        resetIdleTimer();
+        if (dinoStats.coins < 15) {
+          document.getElementById("dinoSpeech").innerText =
+            "⟨金幣不足 $15，轉蛋機轉不動啦！🎰⟩";
+          return;
+        }
+        dinoStats.coins -= 15;
+        const items = [
+          {
+            name: "特休券",
+            reward: 50,
+            msg: "🎰 抽中稀有【特休券】！變賣賺了 50 塊！🌴",
+          },
+          {
+            name: "廢文貼圖",
+            reward: 25,
+            msg: "🎰 抽中【廢文貼圖】！賣了 25 塊！💬",
+          },
+          {
+            name: "空白週報",
+            reward: 10,
+            msg: "🎰 抽中【空白週報】... 拿回 10 塊錢 📄",
+          },
+          {
+            name: "舊鍵盤",
+            reward: 5,
+            msg: "🎰 抽中滿灰塵的【舊鍵盤】... 賣了 5 塊 ⌨️",
+          },
+        ];
+        const prize = items[Math.floor(Math.random() * items.length)];
+        dinoStats.coins += prize.reward;
+        document.getElementById("dinoSpeech").innerText = prize.msg;
+        localStorage.setItem("dino_coins", dinoStats.coins);
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+      }
+
+      window.addEventListener("mousemove", resetIdleTimer);
+    </script>
+  </body>
+</html>

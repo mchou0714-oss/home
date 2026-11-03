@@ -1,0 +1,1 @@
+var localDinoData = {"data":{"coins":17813,"hunger":14,"thirst":24,"mood":57,"bag":{"chicken":10,"sprite":9,"beer":10,"salad":10},"unlocked_pets":{"dino":true,"boss":false,"cat":false,"rabbit":false,"seal":false,"frog":false,"panda":false,"pigeon":false},"current_pet":"🦖"}};
