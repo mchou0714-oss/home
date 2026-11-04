@@ -99,7 +99,8 @@
       .market-tab-btn {
         font-size: 9px;
         font-weight: 500;
-        padding: 3px 8px;
+        padding: 3px 2px;
+        white-space: nowrap;
         border-radius: 6px 6px 0 0;
         cursor: pointer;
         background: #eae6df;
@@ -154,6 +155,20 @@
         justify-content: space-between;
         gap: 5px;
         min-width: 0;
+      }
+
+      #subPanelFood .market-item {
+        cursor: pointer;
+        transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+      }
+      #subPanelFood .market-item:hover {
+        border-color: #b9c6ae;
+      }
+      #subPanelFood .market-item.food-selected {
+        border: 2px solid #94a684;
+        padding: 5px;
+        background: #f7f8f3;
+        box-shadow: 0 0 0 2px rgba(148,166,132,.14);
       }
 
       .market-game {
@@ -263,7 +278,9 @@
   min-height: 155px !important;
   max-height: 155px !important;
 }
-      .stock-select-card { min-height: 44px; border: 1px solid #EAE6DF; border-radius: 12px; background: rgba(255,255,255,.88); padding: 6px 8px; text-align: left; color: #5C5247; }
+      #stockFeeSimulator > summary::-webkit-details-marker { display:none; }
+      #inflationToast { position:absolute; left:8px; right:8px; bottom:calc(100% + 8px); z-index:90; }
+      .stock-select-card { display:flex; align-items:center; justify-content:space-between; gap:4px; width:100%; min-height:44px; border:1px solid #EAE6DF; border-radius:12px; background:rgba(255,255,255,.88); padding:6px 8px; text-align:left; color:#5C5247; }
       .stock-select-card.stock-selected { border: 2px solid #94A684; background: #F7F8F3; padding: 6px 7px; }
       .stock-qty-control { display: flex; align-items: center; height: 24px; border: 1px solid #eae6df; border-radius: 7px; overflow: hidden; background: #fff; flex-shrink: 0; }
       .stock-qty-control button { width: 18px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; color: #5c5247; }
@@ -274,6 +291,9 @@
       #bagFoodSection, #bagSnackSection { max-height: 158px; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-right: 2px; align-content: start; }
       #bagFoodGrid, #bagSnackGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; align-content: start; }
       #panelAction button:disabled, #subPanelPet button:disabled, #dinoSpeech button:disabled { background: #eeece7 !important; color: #a39e93 !important; border-color: #e5e1d8 !important; opacity: .72; filter: grayscale(.7); cursor: not-allowed !important; box-shadow: none !important; }
+      #dinoCard.mini-game-locked #dinoPanel { pointer-events:none !important; opacity:.55; filter:grayscale(.35); }
+      #dinoCard.mini-game-locked #tabStats,#dinoCard.mini-game-locked #tabFeed,#dinoCard.mini-game-locked #tabAction,#dinoCard.mini-game-locked #tabMarket,#dinoCard.mini-game-locked #tabStock,#dinoCard.mini-game-locked #dinoIcon,#dinoCard.mini-game-locked #randomEventNotice,#dinoCard.mini-game-locked #settingsButton { pointer-events:none !important; opacity:.5; cursor:not-allowed !important; }
+      #dinoCard.mini-game-locked #dinoSpeech button { pointer-events:auto !important; }
       #subPanelGame .market-game { min-height: 90px; text-align: left; transition: background .2s; }
       #panelAction button[onclick="playToy()"] { background: #fff9e9; border-color: #efe2c6; }
       #panelAction button[onclick="giveHug()"] { background: #fff4f7; border-color: #efdae3; }
@@ -281,6 +301,22 @@
       #panelAction button[onclick="punchAir()"] { background: #fff4f3; border-color: #f1dcd9; }
       #panelAction button[onclick="takePaidPoop()"] { background: #fff8e9; border-color: #efe2ca; }
       .stat-critical { background-color: #e06c75 !important; }
+      #randomEventNotice:not(.hidden) {
+        animation: eventNoticePulse 1.5s ease-in-out infinite;
+        border: 1px solid #e7a83d;
+        box-shadow: 0 0 0 2px rgba(231,168,61,.18);
+      }
+      #dinoCard.has-pending-event {
+        border-color: #e7a83d !important;
+        box-shadow: 0 0 0 2px rgba(231,168,61,.28), 0 10px 30px rgba(0,0,0,.12) !important;
+      }
+      @keyframes eventNoticePulse {
+        0%, 100% { background-color: #fff4d6; transform: scale(1); }
+        50% { background-color: #ffd978; transform: scale(1.06); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #randomEventNotice:not(.hidden) { animation: none; }
+      }
       input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
       input[type="number"]::-webkit-inner-spin-button,
       input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -312,6 +348,7 @@
           </span>
         </div>
         <div class="flex items-center gap-2">
+          <button id="randomEventNotice" type="button" onclick="openPendingOfficeEvent()" title="有突發事件待處理，點擊查看" aria-label="有突發事件待處理，點擊查看" aria-live="polite" class="hidden rounded-full bg-amber-100 px-2 py-1 text-[9px] font-bold text-amber-900">⚠️ 待處理</button>
           <span id="dinoTitle" class="text-[9px] text-[#A39E93] font-normal"
             >狀態：正常運轉</span
           >
@@ -323,12 +360,13 @@
         <div
           class="bg-[#FFFDF9] px-2.5 py-1.5 rounded-2xl border border-[#EAE6DF] flex items-center gap-3 transition select-none shadow-xs min-h-[110px] overflow-y-auto"
         >
-          <div
+          <button
             id="dinoIcon"
-            class="w-9 h-9 rounded-xl bg-[#F5F2EB] border border-[#EAE6DF] flex items-center justify-center text-xl shrink-0"
+            onclick="openDinoHome()" title="查看每日小恐龍日誌" type="button"
+            class="w-9 h-9 rounded-xl bg-[#F5F2EB] border border-[#EAE6DF] flex items-center justify-center text-xl shrink-0 cursor-pointer hover:bg-[#EAE6DF]"
           >
             🦖
-          </div>
+          </button>
           <div class="flex-1 min-w-0 h-full flex items-center overflow-auto">
             <p
               id="dinoSpeech"
@@ -396,7 +434,12 @@
                 >80%</span
               >
             </div>
-            <div class="stats-hint"><span>⏱️ 每 15 秒下降 5%</span><span>低於 30% 不能派打工</span></div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 shrink-0 text-[#7C7063] font-bold">💼 壓力</span>
+              <div class="flex-1 h-1.5 bg-[#EAE6DF] rounded-full overflow-hidden"><div id="stressBar" class="h-full bg-violet-400 w-0 rounded-full"></div></div>
+              <span id="stressText" class="w-7 text-right font-bold text-[#5C5247]">0%</span>
+            </div>
+            <div class="stats-hint"><span>⏱️ 狀態每分鐘下降 2%</span><span id="stressHint">壓力穩定</span></div>
           </div>
 
           <!-- 背包 -->
@@ -621,7 +664,7 @@
                 id="subTabFood"
                 class="market-tab-btn active flex-1 text-center"
               >
-                🍖 食物補給
+                🍖 食物
               </button>
 
               <button
@@ -629,7 +672,7 @@
                 id="subTabGame"
                 class="market-tab-btn flex-1 text-center"
               >
-                🎰 地下遊藝
+                🎰 遊藝
               </button>
 
               <button
@@ -637,7 +680,14 @@
                 id="subTabPet"
                 class="market-tab-btn flex-1 text-center"
               >
-                🦖 寵物商城
+                🦖 寵物
+              </button>
+              <button
+                onclick="switchMarketSubTab('care')"
+                id="subTabCare"
+                class="market-tab-btn flex-1 text-center"
+              >
+                🩺 療養
               </button>
             </div>
 
@@ -830,7 +880,7 @@
                   <div class="text-[9px] text-indigo-500 mt-1">
                     猜正反面，試試手氣
                   </div>
-                  <div class="font-bold mt-1">$10 / 次</div>
+                  <div class="font-bold mt-1" id="gamePrice_coin">$10 / 次</div>
                 </button>
 
                 <button
@@ -841,7 +891,7 @@
                   <div class="text-[9px] text-purple-500 mt-1">
                     珍奶連線拿大獎
                   </div>
-                  <div class="font-bold mt-1">$25 / 次</div>
+                  <div class="font-bold mt-1" id="gamePrice_slot">$25 / 次</div>
                 </button>
 
                 <button
@@ -852,7 +902,7 @@
                   <div class="text-[9px] text-rose-500 mt-1">
                     挑戰主管，贏取獎金
                   </div>
-                  <div class="font-bold mt-1">$15 / 次</div>
+                  <div class="font-bold mt-1" id="gamePrice_boss">$15 / 次</div>
                 </button>
 
                 <button
@@ -863,7 +913,7 @@
                   <div class="text-[9px] text-amber-600 mt-1">
                     抽取神祕辦公室道具
                   </div>
-                  <div class="font-bold mt-1">$15 / 次</div>
+                  <div class="font-bold mt-1" id="gamePrice_gacha">$15 / 次</div>
                 </button>
                               <button type="button" onclick="showGachaCollection()" class="market-game col-span-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg p-2 flex items-center justify-between">
                   <span><span class="font-bold text-[11px]">📚 收藏圖鑑</span><span class="block text-[9px] text-emerald-700 mt-1">查看已收集的辦公室珍品</span></span>
@@ -1000,11 +1050,30 @@
                   </button>
                 </div>
               </div>
+              <div id="subPanelCare" class="hidden grid grid-cols-2 gap-2 text-[10px]">
+                <button type="button" onclick="showCareItemInfo('leave')" class="rounded-xl border border-[#EAE6DF] bg-white p-2 text-left hover:border-[#94A684]">
+                  <span class="block text-center text-xl">📝</span><span class="mt-1 block text-center font-bold text-[#4A3F35]">特休假單</span><span id="carePrice_leave" class="mt-0.5 block text-center font-bold text-amber-700">$500</span><span class="mt-1 block text-center text-[8px] text-[#8C7E70]">完全恢復飢餓與口渴</span>
+                </button>
+                <button type="button" onclick="showCareItemInfo('medicine')" class="rounded-xl border border-[#EAE6DF] bg-white p-2 text-left hover:border-[#94A684]">
+                  <span class="block text-center text-xl">💊</span><span class="mt-1 block text-center font-bold text-[#4A3F35]">特效藥</span><span id="carePrice_medicine" class="mt-0.5 block text-center font-bold text-amber-700">$300</span><span class="mt-1 block text-center text-[8px] text-[#8C7E70]">基本治療與恢復</span>
+                </button>
+                <div id="careShopStatus" class="col-span-2 rounded-lg bg-[#F8F6F1] px-2 py-1.5 text-center text-[9px] text-[#7C7063]">飢餓或口渴歸零持續 5 分鐘會進入病假；只計程式開啟且未打工的時間。</div>
+              </div>
             </div>
           </div>
 
           <!-- 股市 -->
           <div id="panelStock" class="hidden flex flex-col gap-1.5 text-[10px] h-full overflow-y-auto pr-1">
+            <details id="stockFeeSimulator" class="rounded-lg border border-[#EAE6DF] bg-white px-2 py-1">
+              <summary class="flex cursor-pointer list-none items-center gap-1 text-[8px] font-bold text-[#7C7063]"><span id="stockHoldingFeeInfo" class="min-w-0 flex-1 truncate">持有費 1%／小時・只計程式開啟時間</span><span class="shrink-0 text-[#94A684]">試算⌄</span></summary>
+              <div id="stockFeeSimulationResults" class="mt-1 grid grid-cols-3 gap-1"></div>
+              <div class="mt-1 text-[7px] text-[#A39E93]">按全部持股市值估算；只計程式開啟時間。假設股價維持目前價格，實際扣款依收費時市值計算；試算不會扣金幣。</div>
+            </details>
+            <div class="flex items-center gap-1">
+              <button id="stockFilterAll" type="button" onclick="setStockListFilter(false)" class="rounded-md bg-[#94A684] px-2 py-1 text-[8px] font-bold text-white">全部股票</button>
+              <button id="stockFilterHeld" type="button" onclick="setStockListFilter(true)" class="rounded-md bg-white px-2 py-1 text-[8px] font-bold text-[#7C7063]">我的持股</button>
+              <span id="stockHoldingsSummary" class="ml-auto text-[8px] font-bold text-[#7C7063]"></span>
+            </div>
             <div id="stockList" class="grid grid-cols-2 gap-1.5 content-start"></div>
           </div>
         </div>
@@ -1052,7 +1121,7 @@
       <div
         class="pt-1 border-t border-[#F2ECE1] flex justify-end relative text-[10px]"
       >
-        <button
+          <button id="settingsButton"
           onclick="toggleSettingsMenu(event)"
           class="w-6 h-6 rounded-md hover:bg-[#EAE6DF] text-[#A39E93] hover:text-[#4A3F35] transition flex items-center justify-center cursor-pointer"
           title="系統設定與備份"
@@ -1095,10 +1164,22 @@
           <div id="randomEventTitle" class="mb-1 text-[12px] font-bold text-[#4A3F35]"></div>
           <div id="randomEventStory" class="mb-3 text-[10px] leading-relaxed text-[#7C7063]"></div>
           <div id="randomEventChoices" class="grid grid-cols-1 gap-1.5"></div>
+          <button type="button" onclick="postponeRandomOfficeEvent()" class="mt-2 w-full rounded-lg px-2 py-1.5 text-[9px] font-bold text-[#8C7E70] hover:bg-[#F5F2EB]">稍後再處理</button>
         </div>
       </div>
-    </div>
+      <div id="inflationToast" role="status" aria-live="polite" class="hidden rounded-xl border border-amber-200 bg-[#FFF9E9] px-3 py-2 text-[9px] text-[#5C5247] shadow-lg">
+        <div id="inflationToastTitle" class="font-bold text-amber-800"></div>
+        <div id="inflationToastDetails" class="mt-0.5 leading-relaxed"></div>
+      </div>
 
+    </div>
+      <div id="dinoHomeModal" class="hidden fixed inset-0 z-[100000] items-center justify-center bg-[#342e28]/45 p-3" onclick="if(event.target===this)closeDinoHome()">
+        <div class="w-full max-w-[420px] max-h-[85vh] overflow-y-auto rounded-2xl border border-[#EAE6DF] bg-[#FFFDF9] p-3 shadow-2xl" onclick="event.stopPropagation()">
+          <div class="mb-2 flex items-center justify-between"><div class="font-bold text-[13px] text-[#4A3F35]">📖 每日小恐龍日誌</div><button type="button" onclick="closeDinoHome()" class="rounded-lg bg-[#F5F2EB] px-2 py-1 text-[10px] font-bold text-[#7C7063]">關閉</button></div>
+          <div id="dinoJournalDate" class="mb-2 text-[10px] font-bold text-[#4A3F35]"></div>
+          <div id="dinoJournalEntries" class="max-h-[70vh] space-y-1 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
     <!-- 💡 JavaScript 邏輯 -->
     <script>
 
@@ -1109,9 +1190,9 @@
         salad: { emoji: "🥗", name: "沙拉", price: 5, effects: { hunger: 15, mood: -10 } },
         onigiri: { emoji: "🍙", name: "鮭魚飯糰", price: 18, effects: { hunger: 30, mood: 5 } },
         americano: { emoji: "☕", name: "美式咖啡", price: 20, effects: { thirst: 25, mood: 20 } },
-        pudding: { emoji: "🍮", name: "焦糖布丁", price: 18, effects: { hunger: 10, mood: 25 } },
+        pudding: { emoji: "🍮", name: "焦糖布丁", price: 18, effects: { hunger: 10, mood: 25, stress: -8 } },
         ramen: { emoji: "🍜", name: "泡麵", price: 25, effects: { hunger: 45, thirst: -10 } },
-        strawberryCake: { emoji: "🍰", name: "草莓蛋糕", price: 30, effects: { hunger: 20, mood: 40 } },
+        strawberryCake: { emoji: "🍰", name: "草莓蛋糕", price: 30, effects: { hunger: 20, mood: 40, stress: -15 } },
         energyDrink: { emoji: "⚡", name: "能量飲料", price: 25, effects: { thirst: 40, mood: 15, hunger: -5 } },
       };
       const savedBag = JSON.parse(localStorage.getItem("dino_bag") || "null") || {};
@@ -1125,10 +1206,144 @@
         hunger: loadSavedPercent("dino_hunger"),
         thirst: loadSavedPercent("dino_thirst"),
         mood: loadSavedPercent("dino_mood"),
+        stress: Math.max(0, Math.min(100, Number(localStorage.getItem("dino_stress")) || 0)),
         coins: parseInt(localStorage.getItem("dino_coins")) || 0,
         bag: Object.fromEntries(Object.keys(foodCatalog).map((key) => [key, savedBag[key] ?? defaultBag[key] ?? 0])),
       };
+      let journalData = {};
+      try { const savedJournal = JSON.parse(localStorage.getItem("dino_journal") || "{}"); journalData = savedJournal && typeof savedJournal === "object" && !Array.isArray(savedJournal) ? savedJournal : {}; } catch (error) { journalData = {}; }
+      const ensureJournalDay = (day = getTodayKey()) => {
+        if (!journalData[day] || typeof journalData[day] !== "object") journalData[day] = { note: "", entries: [] };
+        if (!Array.isArray(journalData[day].entries)) journalData[day].entries = [];
+        if (typeof journalData[day].note !== "string") journalData[day].note = "";
+        return journalData[day];
+      };
+      function logJournalActivity(message) {
+        const day = ensureJournalDay();
+        day.entries.unshift({ time: new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false }), message: String(message) });
+        day.entries = day.entries.slice(0, 100);
+        localStorage.setItem("dino_journal", JSON.stringify(journalData));
+        if (!document.getElementById("dinoHomeModal")?.classList.contains("hidden")) renderDinoJournal();
+      }
+      function escapeJournalText(value) {
+        return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      }
+      function changeStress(amount) {
+        dinoStats.stress = Math.max(0, Math.min(100, dinoStats.stress + amount));
+        localStorage.setItem("dino_stress", String(dinoStats.stress));
+        if (typeof updateStatsUI === "function") updateStatsUI();
+      }
+      function renderDinoJournal() {
+        const dayKey = getTodayKey();
+        const day = ensureJournalDay(dayKey);
+        const dateEl = document.getElementById("dinoJournalDate");
+        const entriesEl = document.getElementById("dinoJournalEntries");
+        if (dateEl) dateEl.innerText = dayKey + " 的日誌";
+        if (entriesEl) entriesEl.innerHTML = day.entries.map((entry) => '<div class="flex gap-2 rounded-lg bg-white px-2 py-1.5"><span class="shrink-0 text-[9px] font-bold text-[#94A684]">' + escapeJournalText(entry.time || "") + '</span><span class="min-w-0 text-[10px] text-[#5C5247]">' + escapeJournalText(entry.message || "") + '</span></div>').join("") || '<div class="py-4 text-center text-[10px] text-[#A39E93]">今天的活動會記錄在這裡。</div>';
+      }
+      function openDinoHome() {
+        document.getElementById("dinoHomeModal").classList.remove("hidden");
+        document.getElementById("dinoHomeModal").classList.add("flex");
+        renderDinoJournal();
+      }
+      function closeDinoHome() {
+        document.getElementById("dinoHomeModal").classList.add("hidden");
+        document.getElementById("dinoHomeModal").classList.remove("flex");
+      }
+      function showCareItemInfo(kind) {
+        const items = {
+          leave: { name: "📝 特休假單", price: 500, restoreAll: true, mood: 25, stress: -10 },
+          medicine: { name: "💊 特效藥", price: 300, hunger: 35, thirst: 35, mood: 10 },
+        };
+        const item = items[kind];
+        if (!item) return;
+        const speech = document.getElementById("dinoSpeech");
+        const status = document.getElementById("careShopStatus");
+        if (!isSick) {
+          if (status) status.innerText = "尚未進入病假，療養品暫不可購買；飢餓或口渴歸零持續 5 分鐘後才會開放。";
+          speech.innerHTML = '<div class="flex flex-col gap-1 w-full"><b>' + item.name + '</b><span>價格：$' + item.price + '</span><span>治療效果：' + (kind === "leave" ? "解除病假、飢餓與口渴恢復至 100%、心情 +25%、壓力 -10%" : "解除病假、飢餓與口渴各 +35%、心情 +10%") + '</span><span class="text-[9px] text-[#8C7E70]">病假開始後才可購買。</span></div>';
+          return;
+        }
+        if (status) status.innerText = "病假中：特效藥 $300 為基本治療；特休假單 $500 可完全恢復飢餓與口渴，並降低壓力。";
+        speech.innerHTML = '<div class="flex flex-col gap-1.5 w-full"><b>' + item.name + '　$' + item.price + '</b><span class="text-[9px]">' + (kind === "leave" ? "病假解除，飢餓與口渴恢復至 100%，心情 +25%、壓力 -10%" : "病假解除，飢餓與口渴各 +35%，心情 +10%") + '</span><button type="button" onclick="buyCareItem(\'' + kind + '\')" class="self-end rounded-lg bg-[#94A684] px-3 py-1 text-[10px] font-bold text-white">購買並治療</button></div>';
+      }
+      function buyCareItem(kind) {
+        if (isWorking || isSleeping) return;
+        if (!isSick) return showCareItemInfo(kind);
+        const items = {
+          leave: { name: "特休假單", price: 500, restoreAll: true, mood: 25, stress: -10 },
+          medicine: { name: "特效藥", price: 300, hunger: 35, thirst: 35, mood: 10 },
+        };
+        const item = items[kind];
+        if (!item) return;
+        if (dinoStats.coins < item.price) {
+          document.getElementById("dinoSpeech").innerText = "⟨金幣不足 $" + item.price + "，還不能購買「" + item.name + "」。⟩";
+          return;
+        }
+        dinoStats.coins -= item.price;
+        dinoStats.hunger = item.restoreAll ? 100 : Math.min(100, dinoStats.hunger + item.hunger);
+        dinoStats.thirst = item.restoreAll ? 100 : Math.min(100, dinoStats.thirst + item.thirst);
+        dinoStats.mood = Math.min(100, dinoStats.mood + item.mood);
+        if (item.stress) dinoStats.stress = Math.max(0, dinoStats.stress + item.stress);
+        isSick = false;
+        zeroNeedElapsedMs = 0;
+        localStorage.setItem("dino_sick_leave", "0");
+        localStorage.setItem("dino_zero_need_elapsed_ms", "0");
+        localStorage.setItem("dino_coins", String(dinoStats.coins));
+        updateStatsUI();
+        document.getElementById("coinCount").innerText = dinoStats.coins;
+        document.getElementById("dinoSpeech").innerText = "⟨使用「" + item.name + "」治療成功！病假解除，狀態已恢復。⟩";
+        logJournalActivity("病假治療：購買「" + item.name + "」，花費 $" + item.price);
+        if (document.getElementById("careShopStatus")) document.getElementById("careShopStatus").innerText = "病假已解除；照顧好飢餓與口渴，避免再次歸零。";
+      }
+      function openCareShop() {
+        switchDinoTab("market");
+        switchMarketSubTab("care");
+      }
+      function showSickLockNotice(actionName) {
+        if (!isSick) return false;
+        document.getElementById("dinoSpeech").innerHTML = '<div class="flex flex-col gap-1.5 w-full"><span class="font-bold text-rose-700">病假中，暫時不能' + actionName + '。</span><span class="text-[9px]">到商場「療養」購買特效藥 $300 或特休假單 $500，治療後即可恢復。</span><button type="button" onclick="openCareShop()" class="self-start rounded-lg bg-rose-100 px-2 py-1 text-[9px] font-bold text-rose-800">前往療養區</button></div>';
+        return true;
+      }
+      function updateRandomEventNotice() {
+        const pending = !!currentRandomEvent;
+        const notice = document.getElementById("randomEventNotice");
+        if (notice) {
+          notice.classList.toggle("hidden", !pending);
+          if (pending) {
+            const label = currentRandomEvent.isAudit ? "🚨 主管稽查" : "⚠️ 突發事件";
+            notice.innerText = label;
+            notice.title = currentRandomEvent.title + "（點擊查看）";
+            notice.setAttribute("aria-label", currentRandomEvent.title + "，點擊查看");
+          }
+        }
+        const card = document.getElementById("dinoCard");
+        if (card) card.classList.toggle("has-pending-event", pending);
+      }
+      function openPendingOfficeEvent() {
+        if (!currentRandomEvent) return;
+        document.getElementById("randomEventTitle").innerText = currentRandomEvent.title;
+        document.getElementById("randomEventStory").innerText = currentRandomEvent.story;
+        document.getElementById("randomEventChoices").innerHTML = currentRandomEvent.choices.map((choice, index) => '<button type="button" onclick="resolveRandomOfficeEvent(' + index + ')" class="rounded-lg border border-[#EAE6DF] bg-[#F7F5EF] px-2 py-2 text-left text-[10px] font-bold text-[#5C5247] hover:bg-[#EEF2E9]">' + choice.label + '</button>').join("");
+        const deferButton = document.querySelector("#randomEventOverlay button[onclick=\"postponeRandomOfficeEvent()\"]");
+        if (deferButton) deferButton.innerText = currentRandomEvent.isAudit ? "稍後處理（保留待處理通知）" : "稍後再處理";
+        document.getElementById("randomEventOverlay").classList.remove("hidden");
+        document.getElementById("randomEventOverlay").classList.add("flex");
+        clearTimeout(randomEventPromptTimer);
+        randomEventPromptTimer = currentRandomEvent.isAudit ? null : setTimeout(postponeRandomOfficeEvent, 8000);
+      }
+      function postponeRandomOfficeEvent() {
+        clearTimeout(randomEventPromptTimer);
+        randomEventPromptTimer = null;
+        document.getElementById("randomEventOverlay").classList.add("hidden");
+        document.getElementById("randomEventOverlay").classList.remove("flex");
+      }
       let activeMiniGame = null;
+      let activeMiniGameMessageHtml = "";
+      let pendingGameAudit = false;
+      let gameAuditStreak = 0;
+      let lastGameStartAt = 0;
+      let queuedBossAudit = null;
       let coinFlipRun = null;
       let bossFistRun = null;
       let slotSpinTimer = null;
@@ -1163,10 +1378,72 @@
       }
       let isSleeping = false;
       let isWorking = false;
+      let isSick = localStorage.getItem("dino_sick_leave") === "1";
+      let zeroNeedElapsedMs = Math.max(0, Number(localStorage.getItem("dino_zero_need_elapsed_ms")) || 0);
+      const sickLeaveThresholdMs = 5 * 60 * 1000;
+      let stressRestTimer = null;
       let idleTimer = null;
+      const savedInflationBaseline = localStorage.getItem("dino_inflation_baseline_assets");
+      let inflationBaselineAssets = savedInflationBaseline === null ? NaN : Number(savedInflationBaseline);
+      let inflationTier = 0;
+      let inflationInitialized = false;
+      let inflationNoticeTimer = null;
+      let selectedMarketFoodType = null;
+      const miniGameBaseCosts = { coin: 10, slot: 25, boss: 15, gacha: 15 };
+      function getInflationAssets() {
+        return Math.max(0, dinoStats.coins + (typeof stockMarket === "undefined" ? 0 : getStockPortfolioValue()));
+      }
+      function getInflatedPrice(basePrice) {
+        return Math.ceil(Number(basePrice) * (1 + inflationTier * 0.05));
+      }
+      function showInflationNotice(previousTier, nextTier) {
+        const toast = document.getElementById("inflationToast");
+        const title = document.getElementById("inflationToastTitle");
+        const details = document.getElementById("inflationToastDetails");
+        if (!toast || !title || !details) return;
+        const direction = nextTier > previousTier ? "調漲" : "回落";
+        const sign = nextTier > previousTier ? "+" : "−";
+        const chickenBefore = Math.ceil(foodCatalog.chicken.price * (1 + previousTier * 0.05));
+        const chickenNow = Math.ceil(foodCatalog.chicken.price * (1 + nextTier * 0.05));
+        const slotBefore = Math.ceil(miniGameBaseCosts.slot * (1 + previousTier * 0.05));
+        const slotNow = Math.ceil(miniGameBaseCosts.slot * (1 + nextTier * 0.05));
+        title.innerText = "📣 物價" + direction + " " + sign + Math.abs(nextTier - previousTier) * 5 + "%（目前比原價高 " + nextTier * 5 + "%）";
+        details.innerText = "雞排 $" + chickenBefore + " → $" + chickenNow + "・珍奶拉霸 $" + slotBefore + " → $" + slotNow + "；其他價格也已同步更新。";
+        toast.classList.remove("hidden");
+        clearTimeout(inflationNoticeTimer);
+        inflationNoticeTimer = setTimeout(() => toast.classList.add("hidden"), 7000);
+      }
+      function updateInflationTier() {
+        if (!Number.isFinite(inflationBaselineAssets) || inflationBaselineAssets < 0) {
+          inflationBaselineAssets = getInflationAssets();
+          localStorage.setItem("dino_inflation_baseline_assets", String(inflationBaselineAssets));
+        }
+        const nextTier = Math.max(0, Math.min(6, Math.floor((getInflationAssets() - inflationBaselineAssets) / 2000)));
+        if (!inflationInitialized) {
+          inflationTier = nextTier;
+          inflationInitialized = true;
+        } else if (nextTier === inflationTier) {
+          return;
+        } else {
+          const previousTier = inflationTier;
+          inflationTier = nextTier;
+          showInflationNotice(previousTier, nextTier);
+        }
+        Object.entries(miniGameBaseCosts).forEach(([kind, price]) => {
+          const priceEl = document.getElementById("gamePrice_" + kind);
+          if (priceEl) priceEl.innerText = "$" + getInflatedPrice(price) + " / 次";
+        });
+        if (selectedMarketFoodType && foodCatalog[selectedMarketFoodType]) {
+          const priceEl = document.getElementById("marketFoodPrice");
+          if (priceEl) priceEl.innerText = "$" + getInflatedPrice(foodCatalog[selectedMarketFoodType].price);
+        }
+      }
+      function getMiniGamePrice(kind) {
+        return getInflatedPrice(miniGameBaseCosts[kind] || 0);
+      }
 
       function foodEffectText(food) {
-        const labels = { hunger: "飢餓", thirst: "口渴", mood: "心情" };
+        const labels = { hunger: "飢餓", thirst: "口渴", mood: "心情", stress: "壓力" };
         return Object.entries(food.effects).map(([key, value]) => labels[key] + " " + (value > 0 ? "+" : "") + value + "%").join("、");
       }
       function renderFoodUI() {
@@ -1182,18 +1459,21 @@
       function showMarketFoodInfo(type) {
         const food = foodCatalog[type];
         if (!food) return;
+        selectedMarketFoodType = type;
+        const price = getInflatedPrice(food.price);
         document.querySelectorAll("#subPanelFood .market-item").forEach((card) => card.classList.remove("food-selected"));
         const selectedCard = document.querySelector('#subPanelFood [data-food-key="' + type + '"]');
         if (selectedCard) selectedCard.classList.add("food-selected");
         if (isWorking) {
           document.getElementById("dinoSpeech").innerHTML =
-            '<div class="flex flex-col gap-1.5 w-full"><div class="relative flex items-center justify-center min-h-[16px]"><span class="text-[11px] font-bold text-[#4A3F35]">' + food.emoji + ' ' + food.name + '</span><span class="absolute right-0 text-[11px] font-bold text-amber-600">$' + food.price + '</span></div><div class="text-center text-[10px] font-bold text-[#5C5247]">效果：' + foodEffectText(food) + '</div><span class="text-[9px] text-amber-700">打工中可以查看商品，下班後才能購買。</span></div>';
+            '<div class="flex flex-col gap-1.5 w-full"><div class="relative flex items-center justify-center min-h-[16px]"><span class="text-[11px] font-bold text-[#4A3F35]">' + food.emoji + ' ' + food.name + '</span><span id="marketFoodPrice" class="absolute right-0 text-[11px] font-bold text-amber-600">$' + price + '</span></div><div class="text-center text-[10px] font-bold text-[#5C5247]">效果：' + foodEffectText(food) + '</div><span class="text-[8px] text-[#8C7E70]">現金＋持股市值每增 $2,000，物價加原價 5%（最高 30%）</span><span class="text-[9px] text-amber-700">打工中可以查看商品，下班後才能購買。</span></div>';
           return;
         }
         document.getElementById("dinoSpeech").innerHTML =
           '<div class="flex flex-col gap-1 w-full">' +
-          '<div class="relative flex items-center justify-center min-h-[16px]"><span class="text-[11px] font-bold text-[#4A3F35]">' + food.emoji + ' ' + food.name + '</span><span class="absolute right-0 text-[11px] font-bold text-amber-600">$' + food.price + '</span></div>' +
+          '<div class="relative flex items-center justify-center min-h-[16px]"><span class="text-[11px] font-bold text-[#4A3F35]">' + food.emoji + ' ' + food.name + '</span><span id="marketFoodPrice" class="absolute right-0 text-[11px] font-bold text-amber-600">$' + price + '</span></div>' +
           '<div class="text-center text-[10px] font-bold text-[#5C5247]">效果：' + foodEffectText(food) + '</div>' +
+          '<div class="text-center text-[8px] text-[#8C7E70]">現金＋持股市值每增 $2,000，物價加原價 5%（最高 30%）</div>' +
           '<div class="flex items-center justify-between gap-2 pt-0.5"><div class="food-qty-control"><button type="button" aria-label="減少數量" onclick="changeFoodQty(\'' + type + '\', -1)">−</button><input type="number" id="' + type + 'Qty" value="1" min="1" max="15" aria-label="購買數量" /><button type="button" aria-label="增加數量" onclick="changeFoodQty(\'' + type + '\', 1)">＋</button></div>' +
           '<button type="button" onclick="buyMarketItem(\'' + type + '\')" class="bg-[#94A684] hover:bg-[#839573] text-white px-3 py-1 rounded-md text-[10px] font-bold shrink-0">🛒 購買</button></div></div>';
       }
@@ -1214,6 +1494,13 @@
           }
         });
         localStorage.setItem("stock_cost_includes_buy_fee", "1");
+        if (!Object.values(stockMarket).some((stock) => stock.holding > 0)) {
+          stockHoldingFeeElapsedMs = 0;
+          stockHoldingFeeRemainder = 0;
+          localStorage.setItem("stock_holding_fee_elapsed_ms", "0");
+          localStorage.setItem("stock_holding_fee_remainder", "0");
+        }
+        stockHoldingFeeLastTickAt = Date.now();
         updateStockUI();
 
         if (typeof localDinoData !== "undefined" && localDinoData.data) {
@@ -1244,12 +1531,14 @@
           localStorage.removeItem("dino_has_new_log");
           dinoStats.coins += 15;
           localStorage.setItem("dino_coins", dinoStats.coins);
+          updateInflationTier();
 
           const coinElem = document.getElementById("coinCount");
           if (coinElem) coinElem.innerText = dinoStats.coins;
 
           setTimeout(() => {
             const speechEl = document.getElementById("dinoSpeech");
+
             if (speechEl) {
               let logRewardMsg = "⟨偵測到主人去寫工作紀錄，頒發 15 元獎金💰✨⟩";
               if (currentPetEmoji === "👔") {
@@ -1418,7 +1707,7 @@
         resetIdleTimer();
 
         dinoStats.mood = Math.min(100, dinoStats.mood + 15);
-        updateStatsUI();
+        updateStatsUI(); logJournalActivity("摸摸頭，心情充電");
 
         const lines = petHeadPatLines[currentPetEmoji] || petHeadPatLines["🦖"];
 
@@ -1499,7 +1788,9 @@
         localStorage.setItem("dino_bag", JSON.stringify(dinoStats.bag));
 
         document.getElementById("coinCount").innerText = dinoStats.coins;
+        updateInflationTier();
         document.getElementById("dinoSpeech").innerText = message;
+        logJournalActivity(message);
 
         updateBagUI();
         updateCheckinButtonUI();
@@ -1584,7 +1875,7 @@
 
         dinoStats.mood = Math.min(100, dinoStats.mood + 10);
 
-        updateStatsUI();
+        updateStatsUI(); logJournalActivity("抱抱恐龍，心情充電");
 
         document.getElementById("dinoSpeech").innerText =
           "「抱抱充電成功！今天也要一起努力（或摸魚）喔！💕」";
@@ -1646,7 +1937,7 @@
       function makeDinoSleep() {
         if (isWorking) return;
         isSleeping = true;
-        clearTimeout(idleTimer);
+        changeStress(-12); logJournalActivity("開始午休，壓力降低"); clearTimeout(idleTimer);
         document.getElementById("dinoIcon").innerText = "💤";
         document.getElementById("dinoSpeech").innerText =
           "「Zzz... 主人放過我了，本恐龍先去夢裡躺平囉 🍃 (數值暫停消耗)」";
@@ -1658,7 +1949,7 @@
         resetIdleTimer();
         dinoStats.mood = Math.min(100, dinoStats.mood + 25);
         dinoStats.hunger = Math.max(0, dinoStats.hunger - 5);
-        updateStatsUI();
+        changeStress(-8); updateStatsUI(); logJournalActivity("揮拳發洩，壓力降低");
         document.getElementById("dinoSpeech").innerText =
           "「哈！哈！把剛剛開會機車的主管想像成沙包，敲擊紓壓 🥊🔥」";
       }
@@ -1667,13 +1958,25 @@
         if (isWorking || isSleeping) return;
         resetIdleTimer();
         dinoStats.mood = Math.min(100, dinoStats.mood + 30);
-        updateStatsUI();
-        document.getElementById("dinoSpeech").innerText =
-          "「帶著手機去蹲了 20 分鐘廁所... 帶薪大便真香！這段時間老闆還在付我薪水呢 ☕💩✨」";
+        const lastStressRelief = Number(localStorage.getItem("dino_paid_bathroom_at")) || 0;
+        const canReduceStress = Date.now() - lastStressRelief >= 60000 && dinoStats.stress > 0;
+        if (canReduceStress) {
+          localStorage.setItem("dino_paid_bathroom_at", String(Date.now()));
+          changeStress(-20);
+        }
+        updateStatsUI(); logJournalActivity(canReduceStress ? "帶薪大便，壓力降低" : "帶薪大便，稍作休息");
+        document.getElementById("dinoSpeech").innerText = canReduceStress
+          ? "「帶著手機去廁所放空一下，壓力降低 20%！老闆還在付我薪水呢 ☕💩✨」"
+          : "「帶著手機去蹲一下，心情好多了！壓力紓解需要間隔一分鐘喔 ☕💩✨」";
       }
 
       function sendDinoToWork() {
+        if (showSickLockNotice("派打工")) return;
         if (isWorking || isSleeping) return;
+        if (dinoStats.stress >= 100) {
+          document.getElementById("dinoSpeech").innerHTML = '<div class="flex flex-col gap-2 w-full"><span class="text-[10px] font-bold text-violet-700">⟨壓力爆表了，先休息一下再接工作吧。⟩</span><button type="button" onclick="beginStressRest()" class="rounded-lg bg-violet-100 px-2 py-1.5 text-[10px] font-bold text-violet-800">💤 休息 30 秒（壓力 -25）</button></div>';
+          return;
+        }
         if (activeMiniGame) {
           document.getElementById("dinoSpeech").innerText = "⟨先完成這局遊戲，再派恐龍去打工喔！⟩";
           return;
@@ -1732,12 +2035,24 @@
 
       function startWork(durationSeconds, workTypeName, event) {
         if (event) event.stopPropagation();
+        if (showSickLockNotice("打工")) return;
+        if (dinoStats.stress >= 100) { sendDinoToWork(); return; }
         localStorage.setItem(
           "dino_work_finish",
           Date.now() + durationSeconds * 1000,
         );
         localStorage.setItem("dino_work_type", workTypeName);
         isWorking = true;
+        const auditChance = durationSeconds >= 3600 ? 0.15 : durationSeconds >= 1800 ? 0.10 : durationSeconds >= 900 ? 0.08 : 0.05;
+        if (Math.random() < auditChance) {
+          const auditDelay = Math.floor(durationSeconds * (0.2 + Math.random() * 0.6));
+          localStorage.setItem("dino_work_audit_at", String(Date.now() + auditDelay * 1000));
+          localStorage.setItem("dino_work_audit_rate", durationSeconds >= 1800 ? "0.3" : "0.2");
+          localStorage.removeItem("dino_work_audit_done");
+        } else {
+          ["dino_work_audit_at", "dino_work_audit_rate", "dino_work_audit_done"].forEach((key) => localStorage.removeItem(key));
+        }
+        logJournalActivity("開始打工：「" + workTypeName + "」");
         updateWorkStateUI();
       }
 
@@ -1752,6 +2067,11 @@
         if (timeLeft > 0) {
           isWorking = true;
           updateWorkRestrictionsUI();
+          const auditAt = Number(localStorage.getItem("dino_work_audit_at")) || 0;
+          if (auditAt && Date.now() >= auditAt && localStorage.getItem("dino_work_audit_done") !== "1") {
+            localStorage.setItem("dino_work_audit_done", "1");
+            showBossAudit("work", Number(localStorage.getItem("dino_work_audit_rate")) || 0.2);
+          }
 
           if (workBtn) {
             workBtn.disabled = true;
@@ -1778,8 +2098,11 @@
 
           const [minReward, maxReward] = workRewards[workType] || [15, 34];
 
-          const earned =
-            Math.floor(Math.random() * (maxReward - minReward + 1)) + minReward;
+          const baseEarned = Math.floor(Math.random() * (maxReward - minReward + 1)) + minReward;
+          const workStressGain = { 半天工: 5, 通宵加班: 7, 出差: 9, 辦公室大掃除: 12, 倉庫整理: 18, 系統維護專案: 25 }[workType] || 5;
+          changeStress(workStressGain);
+          const overworked = dinoStats.stress >= 80;
+          const earned = overworked ? Math.floor(baseEarned * 0.8) : baseEarned;
 
           // 發放金幣
           dinoStats.coins += earned;
@@ -1792,7 +2115,8 @@
           const bonusSnack = getWorkSnackReward();
           updateBagUI();
 
-          let resultMessage = `⟨打工回來！完成「${workType}」，賺了 ${earned} 元！🎉⟩`;
+          let resultMessage = `⟨打工回來！完成「${workType}」，賺了 ${earned} 元${overworked ? "（壓力過高，收入減少 20%）" : ""}！🎉⟩`;
+          logJournalActivity("完成打工：「" + workType + "」，收入 $" + earned + (overworked ? "（壓力過高，收入減少20%）" : ""));
 
           if (bonusSnack) {
             resultMessage += `\n🍪 意外獲得 ${bonusSnack.emoji}${bonusSnack.name}！`;
@@ -1825,11 +2149,14 @@
           // 最後才清除打工紀錄
           localStorage.removeItem("dino_work_finish");
           localStorage.removeItem("dino_work_type");
+          ["dino_work_audit_at", "dino_work_audit_rate", "dino_work_audit_done"].forEach((key) => localStorage.removeItem(key));
         }
       }
 
       function updateStatsUI() {
-        document.getElementById("hungerBar").style.width =
+        updateInflationTier();
+                ["hunger", "thirst", "mood", "stress"].forEach((key) => localStorage.setItem(`dino_${key}`, String(dinoStats[key])));
+document.getElementById("hungerBar").style.width =
           dinoStats.hunger + "%";
         document.getElementById("hungerText").innerText =
           dinoStats.hunger + "%";
@@ -1839,19 +2166,28 @@
           dinoStats.thirst + "%";
         document.getElementById("moodBar").style.width = dinoStats.mood + "%";
         document.getElementById("moodText").innerText = dinoStats.mood + "%";
+        document.getElementById("stressBar").style.width = dinoStats.stress + "%";
+        document.getElementById("stressText").innerText = dinoStats.stress + "%";
+        const stressHint = document.getElementById("stressHint");
+        if (stressHint) stressHint.innerText = dinoStats.stress >= 100 ? "過勞：休息30秒" : dinoStats.stress >= 80 ? "過勞：打工收入 -20%" : dinoStats.stress >= 60 ? "壓力偏高，記得休息" : "壓力穩定";
 
         const iconEl = document.getElementById("dinoIcon");
         const titleEl = document.getElementById("dinoTitle");
         const hungerBar = document.getElementById("hungerBar");
         const thirstBar = document.getElementById("thirstBar");
         const moodBar = document.getElementById("moodBar");
+        const stressBar = document.getElementById("stressBar");
         hungerBar.classList.toggle("stat-critical", dinoStats.hunger <= 0);
         thirstBar.classList.toggle("stat-critical", dinoStats.thirst <= 0);
         moodBar.classList.toggle("stat-critical", dinoStats.mood <= 0);
+        stressBar.classList.toggle("stat-critical", dinoStats.stress >= 80);
 
         if (isSleeping || isWorking) return;
 
-        if (dinoStats.hunger <= 0) {
+        if (isSick) {
+          iconEl.innerText = "🤒";
+          titleEl.innerText = "狀態：病假中";
+        } else if (dinoStats.hunger <= 0) {
           iconEl.innerText = "🍖";
           titleEl.innerText = "狀態：飢餓歸零";
         } else if (dinoStats.thirst <= 0) {
@@ -1869,6 +2205,12 @@
         } else if (dinoStats.mood < 30) {
           iconEl.innerText = "💢";
           titleEl.innerText = "狀態：森七七";
+        } else if (dinoStats.stress >= 80) {
+          iconEl.innerText = "😵";
+          titleEl.innerText = "狀態：壓力過高";
+        } else if (dinoStats.stress >= 60) {
+          iconEl.innerText = "😓";
+          titleEl.innerText = "狀態：壓力偏高";
         } else {
           iconEl.innerText = currentPetEmoji;
           titleEl.innerText = "狀態：正常運轉";
@@ -1882,42 +2224,58 @@
         const hungerZero = dinoStats.hunger <= 0;
         const thirstZero = dinoStats.thirst <= 0;
         const moodZero = dinoStats.mood <= 0;
-        if (hungerZero || thirstZero) {
-          const usedToday = localStorage.getItem("dino_emergency_supply_date") === getTodayKey();
-          if (usedToday) {
-            speech.innerHTML = '<div class="flex flex-col gap-1 w-full"><span class="font-bold text-rose-600">恐龍狀態歸零，需要補給！</span><span class="text-[9px] text-[#7C7063]">今天的緊急補給已領取，請用背包食物恢復狀態。</span></div>';
-          } else {
-            speech.innerHTML = '<div class="flex items-center justify-between gap-2 w-full"><span class="min-w-0 text-[10px] font-bold text-rose-600">狀態歸零！領取緊急補給</span><button type="button" onclick="claimEmergencySupply()" class="shrink-0 rounded-lg bg-rose-400 px-2 py-1.5 text-[9px] font-bold text-white">🧃 領補給</button></div><span class="text-[8px] text-[#7C7063]">每日一次；恢復歸零的飢餓與口渴。</span>';
-          }
+        if (isSick) {
+          speech.innerHTML = '<div class="flex flex-col gap-1 w-full"><span class="font-bold text-rose-700">小恐龍進入病假狀態，需要治療。</span><span class="text-[9px] text-[#7C7063]">目前不能打工或玩遊戲；可買特效藥 $300 做基本治療，或買特休假單 $500 完全恢復。</span><button type="button" onclick="openCareShop()" class="self-start rounded-lg bg-rose-100 px-2 py-1 text-[9px] font-bold text-rose-800">前往療養區</button></div>';
+        } else if (hungerZero || thirstZero) {
+          const minutesLeft = Math.max(1, Math.ceil((sickLeaveThresholdMs - zeroNeedElapsedMs) / 60000));
+          speech.innerHTML = '<div class="flex flex-col gap-1 w-full"><span class="font-bold text-rose-600">飢餓或口渴歸零，請盡快補充食物或飲品。</span><span class="text-[9px] text-[#7C7063]">可使用背包食物，或到商場購買補給；目前沒有免費緊急補給。</span><span class="text-[8px] text-rose-700">若持續歸零約 ' + minutesLeft + ' 分鐘，會進入病假。</span></div>';
         } else if (moodZero) {
           speech.innerHTML = '<div class="flex flex-col gap-1 w-full"><span class="font-bold text-rose-600">心情歸零了……</span><span class="text-[9px] text-[#7C7063]">摸摸頭、抱抱或揮拳發洩都能免費恢復心情。</span></div>';
         }
       }
 
-      function claimEmergencySupply() {
-        if (isWorking || isSleeping) return;
-        const today = getTodayKey();
-        if (localStorage.getItem("dino_emergency_supply_date") === today) {
-          updateZeroCareDialogue();
-          return;
-        }
-        if (dinoStats.hunger <= 0) dinoStats.hunger = Math.min(100, dinoStats.hunger + 35);
-        if (dinoStats.thirst <= 0) dinoStats.thirst = Math.min(100, dinoStats.thirst + 35);
-        localStorage.setItem("dino_emergency_supply_date", today);
-        ["hunger", "thirst", "mood"].forEach((key) => localStorage.setItem(`dino_${key}`, String(dinoStats[key])));
-
-        updateStatsUI();
-        document.getElementById("dinoSpeech").innerText = "⟨緊急補給到手！飢餓與口渴恢復了，心情可以用免費互動照顧喔。⟩";
-      }
       setInterval(() => {
         if (!isSleeping && !isWorking) {
-          const dropRate = 5;
+          const hadZeroNeedBeforeTick = dinoStats.hunger <= 0 || dinoStats.thirst <= 0;
+          const dropRate = 2;
           dinoStats.hunger = Math.max(0, dinoStats.hunger - dropRate);
           dinoStats.thirst = Math.max(0, dinoStats.thirst - dropRate);
           dinoStats.mood = Math.max(0, dinoStats.mood - dropRate);
+          dinoStats.stress = Math.max(0, dinoStats.stress - dropRate);
+          if (!isSick && hadZeroNeedBeforeTick) {
+            zeroNeedElapsedMs = Math.min(sickLeaveThresholdMs, zeroNeedElapsedMs + 60000);
+            localStorage.setItem("dino_zero_need_elapsed_ms", String(zeroNeedElapsedMs));
+            if (zeroNeedElapsedMs >= sickLeaveThresholdMs) {
+              isSick = true;
+              localStorage.setItem("dino_sick_leave", "1");
+              logJournalActivity("飢餓或口渴歸零太久，進入病假狀態");
+            }
+          } else if (!isSick) {
+            zeroNeedElapsedMs = 0;
+            localStorage.setItem("dino_zero_need_elapsed_ms", "0");
+          }
           updateStatsUI();
         }
-      }, 15000);
+      }, 60000);
+
+      function beginStressRest() {
+        if (isWorking || isSleeping || dinoStats.stress < 100) return;
+        isSleeping = true;
+        clearTimeout(idleTimer);
+        document.getElementById("dinoIcon").innerText = "💤";
+        document.getElementById("dinoTitle").innerText = "狀態：休息中 30 秒";
+        document.getElementById("dinoSpeech").innerText = "「先放下工作，休息一下再回去面對主管……」";
+        logJournalActivity("壓力爆表，開始休息30秒");
+        clearTimeout(stressRestTimer);
+        stressRestTimer = setTimeout(() => {
+          isSleeping = false;
+          changeStress(-25);
+          updateStatsUI();
+          document.getElementById("dinoSpeech").innerText = "⟨休息好了！壓力降低 25%，可以繼續照顧小恐龍或安排工作。⟩";
+          logJournalActivity("休息結束，壓力降低25%");
+          resetIdleTimer();
+        }, 30000);
+      }
 
       function resetIdleTimer() {
         clearTimeout(idleTimer);
@@ -1959,6 +2317,7 @@
           dinoStats.coins -= price;
           unlockedPets[petKey] = true;
           localStorage.setItem("dino_coins", dinoStats.coins);
+          updateInflationTier();
           localStorage.setItem(
             "dino_unlocked_pets",
             JSON.stringify(unlockedPets),
@@ -2105,7 +2464,7 @@
         resetIdleTimer();
         const amount =
           parseInt(document.getElementById(`${type}Qty`).value) || 1;
-        const cost = foodCatalog[type].price * amount;
+        const cost = getInflatedPrice(foodCatalog[type].price) * amount;
 
         if ((dinoStats.bag[type] || 0) + amount > 15) {
           document.getElementById("dinoSpeech").innerText =
@@ -2121,11 +2480,12 @@
         dinoStats.coins -= cost;
         dinoStats.bag[type] = (dinoStats.bag[type] || 0) + amount;
         localStorage.setItem("dino_coins", dinoStats.coins);
+        updateInflationTier();
         localStorage.setItem("dino_bag", JSON.stringify(dinoStats.bag));
         document.getElementById("coinCount").innerText = dinoStats.coins;
         updateBagUI();
         document.getElementById("dinoSpeech").innerText =
-          `⟨成功批次購入 ${amount} 個！已塞入背包 🎒✨⟩`;
+          `⟨成功批次購入 ${amount} 個！已塞入背包 🎒✨⟩`; logJournalActivity("購買「" + foodCatalog[type].name + "」×" + amount + "，花費 $" + cost);
       }
 
       const stockProfiles = {
@@ -2149,6 +2509,11 @@
         bonus: { price: 45, holding: parseInt(localStorage.getItem("stock_bonus_holding")) || 0, totalCost: parseFloat(localStorage.getItem("stock_bonus_cost")) || 0 },
         layoff: { price: 30, holding: parseInt(localStorage.getItem("stock_layoff_holding")) || 0, totalCost: parseFloat(localStorage.getItem("stock_layoff_cost")) || 0 },
       };
+      const stockHoldingFeeRate = 0.01;
+      const stockHoldingFeePeriodMs = 60 * 60 * 1000;
+      let stockHoldingFeeElapsedMs = Math.max(0, Number(localStorage.getItem("stock_holding_fee_elapsed_ms")) || 0);
+      let stockHoldingFeeRemainder = Math.max(0, Number(localStorage.getItem("stock_holding_fee_remainder")) || 0);
+      let stockHoldingFeeLastTickAt = Date.now();
       const stockMeta = {
         bbt: { emoji: "🧋", name: "珍奶指數" },
         pto: { emoji: "🌴", name: "特休期貨" },
@@ -2160,7 +2525,10 @@
         layoff: { emoji: "🚨", name: "裁員警報指數" },
       };
       let selectedStockType = "bbt";
+      let stockShowHoldingsOnly = false;
       let stockActionNotice = "";
+      let stockTradeCompleted = false;
+      let stockActionTimer = null;
       function saveStockPrices() {
         Object.keys(stockMarket).forEach((type) => localStorage.setItem(`stock_${type}_price`, stockMarket[type].price));
       }
@@ -2168,15 +2536,41 @@
       function renderStockCards() {
         const list = document.getElementById("stockList");
         if (!list) return;
-        list.innerHTML = Object.keys(stockMeta).map((type) => {
+        const heldTypes = Object.keys(stockMeta).filter((type) => stockMarket[type].holding > 0);
+        const totalShares = heldTypes.reduce((sum, type) => sum + stockMarket[type].holding, 0);
+        const summary = document.getElementById("stockHoldingsSummary");
+        if (summary) {
+          summary.innerText = "持有 " + heldTypes.length + " 種・共 " + totalShares + " 張";
+          summary.classList.toggle("hidden", !stockShowHoldingsOnly);
+        }
+        const activeClass = "rounded-md bg-[#94A684] px-2 py-1 text-[8px] font-bold text-white";
+        const idleClass = "rounded-md bg-white px-2 py-1 text-[8px] font-bold text-[#7C7063]";
+        const allButton = document.getElementById("stockFilterAll");
+        const heldButton = document.getElementById("stockFilterHeld");
+        if (allButton) allButton.className = stockShowHoldingsOnly ? idleClass : activeClass;
+        if (heldButton) heldButton.className = stockShowHoldingsOnly ? activeClass : idleClass;
+        const visibleTypes = Object.keys(stockMeta).filter((type) => !stockShowHoldingsOnly || stockMarket[type].holding > 0);
+        list.innerHTML = visibleTypes.length ? visibleTypes.map((type) => {
           const stock = stockMarket[type];
           const selected = type === selectedStockType;
-          return `<button type="button" id="stockCard_${type}" onclick="showStockInfo('${type}')" class="stock-select-card ${selected ? "stock-selected" : ""}"><span class="flex items-center justify-between gap-1"><span class="font-bold text-[10px]">${stockMeta[type].emoji} ${stockMeta[type].name}</span><span class="font-bold text-[12px] text-amber-700">$${stock.price}</span></span></button>`;
-        }).join("");
+          const holding = stockShowHoldingsOnly && stock.holding > 0 ? `<span class="text-[8px] font-bold text-[#7C7063]">持有 ${stock.holding} 張</span>` : "";
+          return `<button type="button" id="stockCard_${type}" onclick="showStockInfo('${type}')" class="stock-select-card ${selected ? "stock-selected" : ""}"><span class="flex min-w-0 flex-col items-start gap-0.5"><span class="font-bold text-[9px] leading-tight">${stockMeta[type].emoji} ${stockMeta[type].name}</span>${holding}</span><span class="shrink-0 font-bold text-[11px] text-amber-700">$${stock.price}</span></button>`;
+        }).join("") : '<div class="col-span-2 rounded-lg bg-white px-2 py-4 text-center text-[9px] text-[#8C7E70]">目前沒有持有股票</div>';
+      }
+      function setStockListFilter(heldOnly) {
+        stockShowHoldingsOnly = !!heldOnly;
+        if (stockShowHoldingsOnly && stockMarket[selectedStockType]?.holding <= 0) {
+          const firstHeld = Object.keys(stockMeta).find((type) => stockMarket[type].holding > 0);
+          if (firstHeld) selectedStockType = firstHeld;
+        }
+        renderStockCards();
+        renderStockDialogue();
       }
       function showStockInfo(type) {
         if (!stockMarket[type]) return;
         selectedStockType = type;
+        clearTimeout(stockActionTimer);
+        stockTradeCompleted = false;
         stockActionNotice = "";
         updateStockUI();
       }
@@ -2195,14 +2589,24 @@
         const profitColor = stock.holding === 0 ? "text-[#8C7E70]" : profit >= 0 ? "text-emerald-600" : "text-rose-500";
         const noticeColor = stockActionNotice.includes("不足") ? "text-rose-500" : "text-emerald-700";
         const notice = stockActionNotice ? `<div class="text-[9px] font-bold ${noticeColor}">${stockActionNotice}</div>` : "";
-        speech.innerHTML = `<div class="flex flex-col gap-1 w-full"><div class="flex items-center justify-between gap-2"><span class="font-bold text-[11px] text-[#4A3F35]">${meta.emoji} ${meta.name}</span><span class="font-bold text-[12px] text-amber-700">$${stock.price}</span></div><div class="flex items-center justify-between gap-2 rounded-lg bg-[#F5F2EB] px-2 py-1"><span class="font-bold text-[11px] text-[#4A3F35]">持有 <span class="text-[13px]">${stock.holding}</span> 張</span><span class="font-bold text-[10px] ${profitColor}">淨損益 ${profitText}</span></div><div class="flex justify-between text-[8px] text-[#7C7063]"><span>均價（含買進費）$${avgCost}</span><span>手續費：買 5%／賣 3%</span></div><div class="flex items-center justify-between gap-2"><span id="stockTradeEstimate" class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[8px] font-bold text-[#5C5247]"></span><div class="flex shrink-0 items-center gap-1"><div class="stock-qty-control"><button type="button" onclick="changeStockQty('${selectedStockType}', -1)">−</button><input type="number" id="${selectedStockType}Qty" value="${qty}" min="1" max="50" oninput="updateStockEstimate('${selectedStockType}')" aria-label="交易張數" /><button type="button" onclick="changeStockQty('${selectedStockType}', 1)">＋</button></div><div class="flex items-center gap-1"><button type="button" onclick="buyStock('${selectedStockType}')" class="bg-[#94A684] text-white px-2 py-1 rounded-md text-[9px] font-bold">買</button><button type="button" onclick="sellStock('${selectedStockType}')" class="bg-rose-400 text-white px-2 py-1 rounded-md text-[9px] font-bold">賣</button></div></div>${notice}</div>`;
+        speech.innerHTML = `<div class="flex flex-col gap-1 w-full"><div class="flex items-center justify-between gap-2"><span class="font-bold text-[11px] text-[#4A3F35]">${meta.emoji} ${meta.name}</span><span class="font-bold text-[12px] text-amber-700">$${stock.price}</span></div><div class="flex items-center justify-between gap-2 rounded-lg bg-[#F5F2EB] px-2 py-1"><span class="font-bold text-[11px] text-[#4A3F35]">持有 <span class="text-[13px]">${stock.holding}</span> 張</span><span class="font-bold text-[10px] ${profitColor}">淨損益 ${profitText}</span></div><div class="flex justify-between text-[8px] text-[#7C7063]"><span>均價（含買進費）$${avgCost}</span><span>手續費：買 5%／賣 3%</span></div><div class="flex items-center justify-between gap-2"><span id="stockTradeEstimate" class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[8px] font-bold text-[#5C5247]"></span><div id="stockTradingControls" class="flex shrink-0 items-center gap-1"><div class="stock-qty-control"><button type="button" onclick="changeStockQty('${selectedStockType}', -1)">−</button><input type="number" id="${selectedStockType}Qty" value="${qty}" min="1" max="50" oninput="updateStockEstimate('${selectedStockType}')" aria-label="交易張數" /><button type="button" onclick="changeStockQty('${selectedStockType}', 1)">＋</button></div><div class="flex items-center gap-1"><button type="button" onclick="buyStock('${selectedStockType}')" class="bg-[#94A684] text-white px-2 py-1 rounded-md text-[9px] font-bold">買</button><button type="button" onclick="sellStock('${selectedStockType}')" class="bg-rose-400 text-white px-2 py-1 rounded-md text-[9px] font-bold">賣</button></div></div>${notice}</div>`;
         updateStockEstimate(selectedStockType);
+        if (stockTradeCompleted) document.getElementById("stockTradingControls")?.classList.add("hidden");
       }
       function updateStockEstimate(type) {
         const estimate = document.getElementById("stockTradeEstimate");
         const stock = stockMarket[type];
         if (!estimate || !stock) return;
-        const qty = Math.min(50, Math.max(1, parseInt(document.getElementById(`${type}Qty`)?.value) || 1));
+        const rawQty = parseInt(document.getElementById(`${type}Qty`)?.value, 10);
+        if (!Number.isFinite(rawQty) || rawQty < 1 || rawQty > 50) {
+          estimate.innerText = rawQty > 50 ? "單次最多交易 50 張" : "請輸入 1～50 張";
+          estimate.classList.remove("text-[#5C5247]");
+          estimate.classList.add("text-rose-500");
+          return;
+        }
+        estimate.classList.remove("text-rose-500");
+        estimate.classList.add("text-[#5C5247]");
+        const qty = rawQty;
         const buyGross = stock.price * qty;
         const buyTotal = buyGross + Math.ceil(buyGross * stockFeeRates.buy);
         const canSell = qty <= stock.holding;
@@ -2238,7 +2642,16 @@
 
       function buyStock(type) {
         resetIdleTimer();
-        const amount = Math.min(50, Math.max(1, parseInt(document.getElementById(`${type}Qty`).value) || 1));
+        const rawAmount = parseInt(document.getElementById(`${type}Qty`).value, 10);
+        if (!Number.isFinite(rawAmount) || rawAmount < 1 || rawAmount > 50) {
+          stockActionNotice = rawAmount > 50 ? "單次最多買進 50 張，已取消本次購買" : "請輸入 1～50 張，已取消本次購買";
+          updateStockUI();
+          const input = document.getElementById(`${type}Qty`);
+          if (input && Number.isFinite(rawAmount)) input.value = rawAmount;
+          updateStockEstimate(type);
+          return;
+        }
+        const amount = rawAmount;
         const stock = stockMarket[type];
         const subtotal = stock.price * amount;
         const fee = Math.ceil(subtotal * stockFeeRates.buy);
@@ -2248,6 +2661,13 @@
           updateStockUI();
           return;
         }
+        if (!Object.values(stockMarket).some((item) => item.holding > 0)) {
+          stockHoldingFeeElapsedMs = 0;
+          stockHoldingFeeRemainder = 0;
+          stockHoldingFeeLastTickAt = Date.now();
+          localStorage.setItem("stock_holding_fee_elapsed_ms", "0");
+          localStorage.setItem("stock_holding_fee_remainder", "0");
+        }
         dinoStats.coins -= cost;
         stock.holding += amount;
         stock.totalCost += cost;
@@ -2255,13 +2675,26 @@
         localStorage.setItem(`stock_${type}_holding`, stock.holding);
         localStorage.setItem(`stock_${type}_cost`, stock.totalCost);
         document.getElementById("coinCount").innerText = dinoStats.coins;
-        stockActionNotice = `買進 ${amount} 張，成交 $${subtotal}，手續費 $${fee}`;
+        stockActionNotice = `✅ 買進 ${amount} 張，成交 $${subtotal}，手續費 $${fee}`;
+        logJournalActivity("買進「" + stockMeta[type].name + "」" + amount + " 張，花費 $" + cost);
+        stockTradeCompleted = true;
         updateStockUI();
+        clearTimeout(stockActionTimer);
+        stockActionTimer = setTimeout(() => { stockTradeCompleted = false; stockActionNotice = ""; updateStockUI(); }, 5000);
       }
 
       function sellStock(type) {
         resetIdleTimer();
-        const amount = Math.min(50, Math.max(1, parseInt(document.getElementById(`${type}Qty`).value) || 1));
+        const rawAmount = parseInt(document.getElementById(`${type}Qty`).value, 10);
+        if (!Number.isFinite(rawAmount) || rawAmount < 1 || rawAmount > 50) {
+          stockActionNotice = rawAmount > 50 ? "單次最多賣出 50 張，已取消本次交易" : "請輸入 1～50 張，已取消本次交易";
+          updateStockUI();
+          const input = document.getElementById(`${type}Qty`);
+          if (input && Number.isFinite(rawAmount)) input.value = rawAmount;
+          updateStockEstimate(type);
+          return;
+        }
+        const amount = rawAmount;
         const stock = stockMarket[type];
         if (stock.holding < amount) {
           stockActionNotice = "持有張數不足";
@@ -2272,21 +2705,96 @@
         const fee = Math.ceil(gross * stockFeeRates.sell);
         const net = gross - fee;
         const avgCost = stock.holding > 0 ? stock.totalCost / stock.holding : 0;
+        const costBasisSold = avgCost * amount;
+        if (net < costBasisSold) changeStress(Math.min(12, Math.max(3, Math.ceil((costBasisSold - net) / 25))));
         stock.holding -= amount;
         stock.totalCost = stock.holding > 0 ? Math.max(0, stock.totalCost - avgCost * amount) : 0;
+        if (!Object.values(stockMarket).some((item) => item.holding > 0)) {
+          stockHoldingFeeElapsedMs = 0;
+          stockHoldingFeeRemainder = 0;
+          stockHoldingFeeLastTickAt = Date.now();
+          localStorage.setItem("stock_holding_fee_elapsed_ms", "0");
+          localStorage.setItem("stock_holding_fee_remainder", "0");
+        }
         dinoStats.coins += net;
         localStorage.setItem("dino_coins", dinoStats.coins);
         localStorage.setItem(`stock_${type}_holding`, stock.holding);
         localStorage.setItem(`stock_${type}_cost`, stock.totalCost);
         document.getElementById("coinCount").innerText = dinoStats.coins;
-        stockActionNotice = `賣出 ${amount} 張，成交 $${gross}，扣手續費 $${fee}，入帳 $${net}`;
+        stockActionNotice = `✅ 賣出 ${amount} 張，成交 $${gross}，扣手續費 $${fee}，入帳 $${net}`;
+        logJournalActivity("賣出「" + stockMeta[type].name + "」" + amount + " 張，實拿 $" + net + (net < costBasisSold ? "，本次虧損並增加壓力" : ""));
+        stockTradeCompleted = true;
         updateStockUI();
+        clearTimeout(stockActionTimer);
+        stockActionTimer = setTimeout(() => { stockTradeCompleted = false; stockActionNotice = ""; updateStockUI(); }, 5000);
       }
 
       function updateStockUI() {
+        if (stockShowHoldingsOnly && stockMarket[selectedStockType]?.holding <= 0) {
+          const firstHeld = Object.keys(stockMeta).find((type) => stockMarket[type].holding > 0);
+          if (firstHeld) selectedStockType = firstHeld;
+        }
         renderStockCards();
         renderStockDialogue();
+        updateStockHoldingFeeInfo();
+        updateInflationTier();
       }
+      function getStockPortfolioValue() {
+        return Object.values(stockMarket).reduce((sum, stock) => sum + stock.price * stock.holding, 0);
+      }
+      function updateStockHoldingFeeInfo() {
+        const info = document.getElementById("stockHoldingFeeInfo");
+        const simulation = document.getElementById("stockFeeSimulationResults");
+        const hasHoldings = Object.values(stockMarket).some((stock) => stock.holding > 0);
+        if (!hasHoldings) {
+          if (info) info.innerText = "持有費 1%／小時・目前無持股";
+          if (simulation) simulation.innerHTML = [1, 3, 8].map((hours) => '<div class="rounded-md bg-[#F8F6F1] p-1 text-center text-[8px] text-[#8C7E70]">' + hours + ' 小時<br><b>$0</b></div>').join("");
+          return;
+        }
+        const portfolioValue = getStockPortfolioValue();
+        const estimatedFee = (portfolioValue * stockHoldingFeeRate).toFixed(2);
+        const minutesLeft = Math.max(1, Math.ceil((stockHoldingFeePeriodMs - stockHoldingFeeElapsedMs) / 60000));
+        if (info) info.innerText = "持有費 1%／小時・約 $" + estimatedFee + "・" + minutesLeft + " 分後";
+        if (simulation) simulation.innerHTML = [1, 3, 8].map((hours) => {
+          const chargeCount = Math.floor((stockHoldingFeeElapsedMs + hours * stockHoldingFeePeriodMs) / stockHoldingFeePeriodMs);
+          const totalFee = Math.floor(stockHoldingFeeRemainder + portfolioValue * stockHoldingFeeRate * chargeCount);
+          const payable = Math.min(dinoStats.coins, totalFee);
+          return '<div class="rounded-md bg-[#F8F6F1] p-1 text-center text-[8px] text-[#8C7E70]">' + hours + ' 小時<br><b class="text-[#5C5247]">約 $' + payable + '</b></div>';
+        }).join("");
+      }
+      function chargeStockHoldingFee() {
+        const portfolioValue = getStockPortfolioValue();
+        if (portfolioValue <= 0) return;
+        const exactFee = portfolioValue * stockHoldingFeeRate + stockHoldingFeeRemainder;
+        const fee = Math.floor(exactFee);
+        stockHoldingFeeRemainder = exactFee - fee;
+        localStorage.setItem("stock_holding_fee_remainder", String(stockHoldingFeeRemainder));
+        const paid = Math.min(dinoStats.coins, fee);
+        dinoStats.coins = Math.max(0, dinoStats.coins - paid);
+        localStorage.setItem("dino_coins", String(dinoStats.coins));
+        const coinCount = document.getElementById("coinCount");
+        if (coinCount) coinCount.innerText = dinoStats.coins;
+        logJournalActivity("股票持有費：本期 $" + exactFee.toFixed(2) + "，扣除 $" + paid + (paid < fee ? "（金幣不足，持股未強制賣出）" : ""));
+        updateStockHoldingFeeInfo();
+      }
+      function accrueStockHoldingFee(now = Date.now()) {
+        const elapsed = Math.max(0, now - stockHoldingFeeLastTickAt);
+        stockHoldingFeeLastTickAt = now;
+        const hasHoldings = Object.values(stockMarket).some((stock) => stock.holding > 0);
+        if (!hasHoldings) {
+          stockHoldingFeeElapsedMs = 0;
+        } else {
+          stockHoldingFeeElapsedMs += elapsed;
+          while (stockHoldingFeeElapsedMs >= stockHoldingFeePeriodMs) {
+            stockHoldingFeeElapsedMs -= stockHoldingFeePeriodMs;
+            chargeStockHoldingFee();
+          }
+        }
+        localStorage.setItem("stock_holding_fee_elapsed_ms", String(stockHoldingFeeElapsedMs));
+        updateStockHoldingFeeInfo();
+      }
+      setInterval(() => accrueStockHoldingFee(), 60000);
+      window.addEventListener("pagehide", () => accrueStockHoldingFee());
       function switchDinoTab(tabName) {
         // 1. 隱藏所有功能面板
         const panels = [
@@ -2364,18 +2872,21 @@
           });
 
           // 恢復恐龍預設對話
-          document.getElementById("dinoSpeech").innerText =
-            "「吼——（隕石來啦!🔥）」";
+          if (activeMiniGame && activeMiniGameMessageHtml) {
+            document.getElementById("dinoSpeech").innerHTML = activeMiniGameMessageHtml;
+          } else {
+            document.getElementById("dinoSpeech").innerText = "「吼——（隕石來啦!🔥）」";
+          }
         }
         if (tabName === "stock") showStockInfo(selectedStockType || "bbt");
       }
 
       function switchMarketSubTab(subName) {
-        ["subPanelFood", "subPanelGame", "subPanelPet"].forEach((p) => {
+        ["subPanelFood", "subPanelGame", "subPanelPet", "subPanelCare"].forEach((p) => {
           const el = document.getElementById(p);
           if (el) el.classList.add("hidden");
         });
-        ["subTabFood", "subTabGame", "subTabPet"].forEach((t) => {
+        ["subTabFood", "subTabGame", "subTabPet", "subTabCare"].forEach((t) => {
           const el = document.getElementById(t);
           if (el) el.className = "market-tab-btn flex-1 text-center";
         });
@@ -2396,6 +2907,12 @@
             "market-tab-btn active flex-1 text-center";
           updatePetStoreUI();
         }
+        if (subName === "care") {
+          document.getElementById("subPanelCare").classList.remove("hidden");
+          document.getElementById("subTabCare").className = "market-tab-btn active flex-1 text-center";
+          const status = document.getElementById("careShopStatus");
+        if (status) status.innerText = isSick ? "病假中：特效藥 $300 為基本治療；特休假單 $500 可完全恢復飢餓與口渴，並降低壓力。" : "尚未進入病假，療養品暫不可購買；歸零持續 5 分鐘後開放。";
+        }
       }
 
 function toggleSettingsMenu(e) {
@@ -2408,14 +2925,27 @@ function toggleSettingsMenu(e) {
       };
       function applyBackupData(saved) {
         if (!saved || typeof saved !== "object") throw new Error("備份資料格式不正確");
+        isSick = saved.sick_leave === true || saved.sick_leave === 1 || saved.sick_leave === "1";
+        zeroNeedElapsedMs = Math.max(0, Math.min(sickLeaveThresholdMs, Number(saved.zero_need_elapsed_ms) || 0));
+        localStorage.setItem("dino_sick_leave", isSick ? "1" : "0");
+        localStorage.setItem("dino_zero_need_elapsed_ms", String(zeroNeedElapsedMs));
+        if (Object.prototype.hasOwnProperty.call(saved, "inflation_baseline_assets")) {
+          inflationBaselineAssets = Math.max(0, Number(saved.inflation_baseline_assets) || 0);
+          localStorage.setItem("dino_inflation_baseline_assets", String(inflationBaselineAssets));
+        } else {
+          inflationBaselineAssets = NaN;
+          localStorage.removeItem("dino_inflation_baseline_assets");
+        }
         if (saved.coins !== undefined) dinoStats.coins = Math.max(0, Number(saved.coins) || 0);
-        ["hunger", "thirst", "mood"].forEach((key) => {
+        ["hunger", "thirst", "mood", "stress"].forEach((key) => {
           if (saved[key] !== undefined) dinoStats[key] = Math.max(0, Math.min(100, Number(saved[key]) || 0));
         });
         if (saved.bag && typeof saved.bag === "object") dinoStats.bag = { ...dinoStats.bag, ...saved.bag };
         if (saved.unlocked_pets && typeof saved.unlocked_pets === "object") unlockedPets = saved.unlocked_pets;
         if (saved.current_pet !== undefined) currentPetEmoji = saved.current_pet;
         if (saved.gacha_collection && typeof saved.gacha_collection === "object") gachaCollectionOwned = saved.gacha_collection;
+        if (saved.stress !== undefined) dinoStats.stress = Math.max(0, Math.min(100, Number(saved.stress) || 0));
+        if (saved.journal && typeof saved.journal === "object" && !Array.isArray(saved.journal)) { journalData = saved.journal; localStorage.setItem("dino_journal", JSON.stringify(journalData)); }
 
         if (saved.work_snacks && typeof saved.work_snacks === "object") {
           workSnackBag = { ...saved.work_snacks };
@@ -2439,7 +2969,18 @@ function toggleSettingsMenu(e) {
           });
           localStorage.setItem("stock_cost_includes_buy_fee", "1");
         }
-        [["dino_coins", dinoStats.coins], ["dino_bag", JSON.stringify(dinoStats.bag)], ["dino_unlocked_pets", JSON.stringify(unlockedPets)], ["dino_current_pet", currentPetEmoji], ["dino_gacha_collection", JSON.stringify(gachaCollectionOwned)]].forEach(([key, value]) => localStorage.setItem(key, value));
+        stockHoldingFeeElapsedMs = Math.max(0, Math.min(stockHoldingFeePeriodMs - 1, Number(saved.stock_holding_fee_elapsed_ms) || 0));
+        localStorage.setItem("stock_holding_fee_elapsed_ms", String(stockHoldingFeeElapsedMs));
+        stockHoldingFeeRemainder = Math.max(0, Number(saved.stock_holding_fee_remainder) || 0);
+        localStorage.setItem("stock_holding_fee_remainder", String(stockHoldingFeeRemainder));
+        if (!Object.values(stockMarket).some((stock) => stock.holding > 0)) {
+          stockHoldingFeeElapsedMs = 0;
+          stockHoldingFeeRemainder = 0;
+          localStorage.setItem("stock_holding_fee_elapsed_ms", "0");
+          localStorage.setItem("stock_holding_fee_remainder", "0");
+        }
+        stockHoldingFeeLastTickAt = Date.now();
+        [["dino_coins", dinoStats.coins], ["dino_stress", dinoStats.stress], ["dino_journal", JSON.stringify(journalData)], ["dino_bag", JSON.stringify(dinoStats.bag)], ["dino_unlocked_pets", JSON.stringify(unlockedPets)], ["dino_current_pet", currentPetEmoji], ["dino_gacha_collection", JSON.stringify(gachaCollectionOwned)]].forEach(([key, value]) => localStorage.setItem(key, value));
 
         if (Object.prototype.hasOwnProperty.call(saved, "last_checkin")) {
           if (saved.last_checkin) localStorage.setItem("dino_last_checkin", saved.last_checkin);
@@ -2453,11 +2994,16 @@ function toggleSettingsMenu(e) {
           if (saved.work_type) localStorage.setItem("dino_work_type", saved.work_type);
           else localStorage.removeItem("dino_work_type");
         }
+        [["work_audit_at", "dino_work_audit_at"], ["work_audit_rate", "dino_work_audit_rate"], ["work_audit_done", "dino_work_audit_done"]].forEach(([field, key]) => {
+          if (!Object.prototype.hasOwnProperty.call(saved, field)) return;
+          if (saved[field] !== null && saved[field] !== undefined && saved[field] !== "") localStorage.setItem(key, String(saved[field]));
+          else localStorage.removeItem(key);
+        });
         if (Object.prototype.hasOwnProperty.call(saved, "emergency_supply_date")) {
           if (saved.emergency_supply_date) localStorage.setItem("dino_emergency_supply_date", saved.emergency_supply_date);
           else localStorage.removeItem("dino_emergency_supply_date");
         }
-        ["hunger", "thirst", "mood"].forEach((key) => localStorage.setItem(`dino_${key}`, String(dinoStats[key])));
+        ["hunger", "thirst", "mood", "stress"].forEach((key) => localStorage.setItem(`dino_${key}`, String(dinoStats[key])));
         if (document.getElementById("coinCount")) document.getElementById("coinCount").innerText = dinoStats.coins;
         if (document.getElementById("dinoIcon")) document.getElementById("dinoIcon").innerText = currentPetEmoji;
         if (typeof updateCheckinButtonUI === "function") updateCheckinButtonUI();
@@ -2471,24 +3017,34 @@ function toggleSettingsMenu(e) {
           price: stock.price,
         }]));
         const data = {
-          backup_version: 3,
+          backup_version: 4,
           exported_at: new Date().toISOString(),
           coins: dinoStats.coins,
           hunger: dinoStats.hunger,
           thirst: dinoStats.thirst,
           mood: dinoStats.mood,
+          stress: dinoStats.stress,
+          journal: journalData,
           bag: dinoStats.bag,
           work_snacks: workSnackBag,
           unlocked_pets: unlockedPets,
           current_pet: currentPetEmoji,
           gacha_collection: gachaCollectionOwned,
           stocks,
+          stock_holding_fee_elapsed_ms: stockHoldingFeeElapsedMs,
+          stock_holding_fee_remainder: stockHoldingFeeRemainder,
+          inflation_baseline_assets: Number.isFinite(inflationBaselineAssets) ? inflationBaselineAssets : getInflationAssets(),
+          sick_leave: isSick,
+          zero_need_elapsed_ms: zeroNeedElapsedMs,
           last_checkin: localStorage.getItem("dino_last_checkin"),
           work_finish: localStorage.getItem("dino_work_finish"),
           work_type: localStorage.getItem("dino_work_type"),
+          work_audit_at: localStorage.getItem("dino_work_audit_at"),
+          work_audit_rate: localStorage.getItem("dino_work_audit_rate"),
+          work_audit_done: localStorage.getItem("dino_work_audit_done"),
           emergency_supply_date: localStorage.getItem("dino_emergency_supply_date"),
         };
-        ["coins", "hunger", "thirst", "mood"].forEach((key) => localStorage.setItem(`dino_${key}`, String(dinoStats[key])));
+        ["coins", "hunger", "thirst", "mood", "stress"].forEach((key) => localStorage.setItem(`dino_${key}`, String(dinoStats[key])));
         const blob = new Blob(
           ["var localDinoData = " + JSON.stringify({ data }) + ";"],
           { type: "text/plain;charset=utf-8" },
@@ -2765,7 +3321,7 @@ function toggleSettingsMenu(e) {
 
           const food = foodCatalog[type];
           itemName = food.emoji + " " + food.name;
-          const statNames = { hunger: "飢餓", thirst: "口渴", mood: "心情" };
+          const statNames = { hunger: "飢餓", thirst: "口渴", mood: "心情", stress: "壓力" };
           effects = [];
           Object.entries(food.effects).forEach(([key, value]) => {
             dinoStats[key] = Math.max(0, Math.min(100, dinoStats[key] + value));
@@ -2781,10 +3337,11 @@ function toggleSettingsMenu(e) {
 
         // 顯示使用結果
         const speechEl = document.getElementById("dinoSpeech");
+        logJournalActivity("使用「" + itemName + "」" + (isSnack ? "（打工零食）" : ""));
 
         const effectHTML = effects
           .map((effect) => {
-            const isPositive = effect.value.startsWith("+");
+            const isPositive = effect.name === "壓力" ? effect.value.startsWith("-") : effect.value.startsWith("+");
 
             const color = isPositive ? "text-emerald-600" : "text-rose-500";
 
@@ -2846,7 +3403,7 @@ function toggleSettingsMenu(e) {
             if (json.endsWith(";")) json = json.slice(0, -1);
             const parsed = JSON.parse(json);
             applyBackupData(parsed.data || parsed);
-            alert("匯入成功！已還原金幣、狀態、背包、寵物、收藏、打工零食與股票資料。");
+            alert("匯入成功！已還原金幣、狀態、壓力、日誌、背包、寵物、收藏、打工零食與股票資料。");
             location.reload();
           } catch (err) {
             alert("匯入失敗：檔案格式不正確，或資料內容無法讀取。");
@@ -2859,10 +3416,42 @@ function toggleSettingsMenu(e) {
       function saveMiniGameCoins() {
         localStorage.setItem("dino_coins", dinoStats.coins);
         document.getElementById("coinCount").innerText = dinoStats.coins;
+        updateInflationTier();
       }
 
       function showMiniGameMessage(html) {
         document.getElementById("dinoSpeech").innerHTML = html;
+        if (activeMiniGame) {
+          activeMiniGameMessageHtml = html;
+        } else {
+          activeMiniGameMessageHtml = "";
+          if (pendingGameAudit) {
+            pendingGameAudit = false;
+            const streak = gameAuditStreak;
+            setTimeout(() => showBossAudit("game", streak >= 3 ? 0.3 : 0.2), 350);
+          }
+        }
+        updateMiniGameLockUI();
+      }
+      function updateMiniGameLockUI() {
+        const locked = !!activeMiniGame;
+        const card = document.getElementById("dinoCard");
+        if (card) card.classList.toggle("mini-game-locked", locked);
+        ["tabStats", "tabFeed", "tabAction", "tabMarket", "tabStock", "dinoIcon", "randomEventNotice", "settingsButton"].forEach((id) => {
+          const control = document.getElementById(id);
+          if (!control) return;
+          if (locked) {
+            if (control.dataset.miniGameDisabled !== "true") {
+              control.dataset.wasDisabledBeforeMiniGame = control.disabled ? "true" : "false";
+              control.dataset.miniGameDisabled = "true";
+            }
+            control.disabled = true;
+          } else if (control.dataset.miniGameDisabled === "true") {
+            control.disabled = control.dataset.wasDisabledBeforeMiniGame === "true";
+            delete control.dataset.miniGameDisabled;
+            delete control.dataset.wasDisabledBeforeMiniGame;
+          }
+        });
       }
 
       function updateWorkRestrictionsUI() {
@@ -2887,7 +3476,20 @@ function toggleSettingsMenu(e) {
         return true;
       }
       function showMiniGameBusyMessage() {
-        showMiniGameMessage("⟨請先完成目前這局遊戲，再開始下一局喔！⟩");
+        if (activeMiniGame && activeMiniGameMessageHtml) {
+          document.getElementById("dinoSpeech").innerHTML = activeMiniGameMessageHtml + '<div class="mt-1 rounded-md bg-amber-50 px-2 py-1 text-[9px] font-bold text-amber-800">目前這局還沒結束，切回遊戲分頁即可繼續。</div>';
+          return;
+        }
+        document.getElementById("dinoSpeech").innerText = "⟨請先完成目前這局遊戲，再開始下一局喔！⟩";
+      }
+
+      function queueBossAuditForGame() {
+        const now = Date.now();
+        if (now - lastGameStartAt > 120000) gameAuditStreak = 0;
+        gameAuditStreak += 1;
+        lastGameStartAt = now;
+        const chance = Math.min(0.08 + (gameAuditStreak - 1) * 0.04, 0.20);
+        if (Math.random() < chance) pendingGameAudit = true;
       }
 
       function miniGameButton(label, action, colorClass) {
@@ -2896,11 +3498,12 @@ function toggleSettingsMenu(e) {
 
       function showMiniGameRules(kind) {
         if (activeMiniGame) return showMiniGameBusyMessage();
+        if (showSickLockNotice("玩遊戲")) return;
         const rules = {
-          coin: { title: "🪙 硬幣連莊", cost: 10, text: "選正面或反面。猜中可領獎或續猜；猜錯本局獎金歸零。最多六關，首勝 $20，六連勝最高 $640。每關猜中率 50%。", action: "playCoinFlip()" },
-          slot: { title: "🧋 珍奶拉霸", cost: 25, text: "看三個圖示轉出結果：三連線 10% 得 $100 和一份食物；兩個相同 30% 得 $40 和一份食物；沒連線 60%。食物背包滿時改補 $5。", action: "playSlotMachine()" },
-          boss: { title: "🥊 主管猜拳", cost: 15, text: "選剪刀、石頭或布。贏了可領獎或續猜，最多六關；平手重猜並保留獎金，輸了本局獎金歸零。首勝 $30，六連勝最高 $960。", action: "playBossFistGame()" },
-          gacha: { title: "🎰 摸魚轉蛋", cost: 15, text: "抽取金幣（50%）、食物（35%）或收藏品（15%）；稀有收藏占收藏獎的 20%。重複收藏折金幣，一般 $5、稀有 $25。", action: "playGashapon()" },
+          coin: { title: "🪙 硬幣連莊", cost: getMiniGamePrice("coin"), text: "選正面或反面。猜中可領獎或續猜；猜錯本局獎金歸零。最多六關，首勝 $20，六連勝最高 $640。每關猜中率 50%。", action: "playCoinFlip()" },
+          slot: { title: "🧋 珍奶拉霸", cost: getMiniGamePrice("slot"), text: "看三個圖示轉出結果：三連線 10% 得 $100 和一份食物；兩個相同 30% 得 $40 和一份食物；沒連線 60%。食物背包滿時改補 $5。", action: "playSlotMachine()" },
+          boss: { title: "🥊 主管猜拳", cost: getMiniGamePrice("boss"), text: "選剪刀、石頭或布。贏了可領獎或續猜，最多六關；平手重猜並保留獎金，輸了本局獎金歸零。首勝 $30，六連勝最高 $960。", action: "playBossFistGame()" },
+          gacha: { title: "🎰 摸魚轉蛋", cost: getMiniGamePrice("gacha"), text: "抽取金幣（50%）、食物（35%）或收藏品（15%）；稀有收藏占收藏獎的 20%。重複收藏折金幣，一般 $5、稀有 $25。", action: "playGashapon()" },
         };
         const game = rules[kind];
         if (!game) return;
@@ -2910,7 +3513,7 @@ function toggleSettingsMenu(e) {
         showMiniGameMessage(
           '<div class="flex flex-col gap-1.5 w-full"><div class="font-bold text-[11px] text-[#4A3F35]">' + game.title + '</div>' +
           '<div class="text-[9px] leading-relaxed text-[#5C5247]">' + game.text + '</div>' +
-          '<div class="text-[9px] font-bold text-amber-600">入場費：$' + game.cost + '（開始後才扣款）</div>' +
+          '<div class="text-[9px] font-bold text-amber-600">入場費：$' + game.cost + '（開始後才扣款；費用會依資產調整）</div>' +
           '<div class="flex gap-1 items-center">' + actions + '</div></div>'
         );
       }
@@ -2918,18 +3521,22 @@ function toggleSettingsMenu(e) {
         document.getElementById("dinoSpeech").innerText = "了解規則後再開始，金幣不會先扣喔！";
       }
       function playCoinFlip() {
+        if (showSickLockNotice("玩遊戲")) return;
         if (showWorkLockNotice("玩遊戲")) return;
         resetIdleTimer();
         if (activeMiniGame) return showMiniGameBusyMessage();
-        if (dinoStats.coins < 10) {
-          showMiniGameMessage("⟨金幣不足 $10，無法玩硬幣連莊！🪙⟩");
+        const entryFee = getMiniGamePrice("coin");
+        if (dinoStats.coins < entryFee) {
+          showMiniGameMessage("⟨金幣不足 $" + entryFee + "，無法玩硬幣連莊！🪙⟩");
           return;
         }
-        dinoStats.coins -= 10;
+        dinoStats.coins -= entryFee;
         saveMiniGameCoins();
         coinFlipRun = { round: 0, prize: 0 };
         activeMiniGame = "coin";
-        renderCoinFlipChoices("已扣除入場費 $10，猜中可領獎或繼續加倍。猜錯本局獎金歸零。");
+        queueBossAuditForGame();
+        changeStress(4); logJournalActivity("開始玩硬幣連莊，入場費 $" + entryFee);
+        renderCoinFlipChoices("已扣除入場費 $" + entryFee + "，猜中可領獎或繼續加倍。猜錯本局獎金歸零。");
       }
 
       function renderCoinFlipChoices(note) {
@@ -2975,16 +3582,20 @@ function toggleSettingsMenu(e) {
       }
 
       function playSlotMachine() {
+        if (showSickLockNotice("玩遊戲")) return;
         if (showWorkLockNotice("玩遊戲")) return;
         resetIdleTimer();
         if (activeMiniGame) return showMiniGameBusyMessage();
-        if (dinoStats.coins < 25) {
-          showMiniGameMessage("⟨金幣不足 $25，買不起珍奶拉霸！🧋⟩");
+        const entryFee = getMiniGamePrice("slot");
+        if (dinoStats.coins < entryFee) {
+          showMiniGameMessage("⟨金幣不足 $" + entryFee + "，買不起珍奶拉霸！🧋⟩");
           return;
         }
-        dinoStats.coins -= 25;
+        dinoStats.coins -= entryFee;
         saveMiniGameCoins();
         activeMiniGame = "slot";
+        queueBossAuditForGame();
+        changeStress(4); logJournalActivity("開始玩珍奶拉霸，入場費 $" + entryFee);
         const symbols = ["🧋", "🍙", "☕", "🍮", "🍜", "🍰", "⚡", "⭐"];
         showMiniGameMessage('<div class="flex flex-col items-center gap-1 w-full"><span class="font-bold text-purple-700">🧋 拉霸轉動中…</span><div id="slotReels" class="flex justify-center gap-2"><span class="bg-purple-50 rounded-lg px-3 py-1 text-xl">❔</span><span class="bg-purple-50 rounded-lg px-3 py-1 text-xl">❔</span><span class="bg-purple-50 rounded-lg px-3 py-1 text-xl">❔</span></div><span class="text-[9px] text-[#8C7E70]">三個相同是大獎，兩個相同也有獎勵！</span></div>');
         slotSpinTimer = setInterval(() => {
@@ -3049,18 +3660,22 @@ function toggleSettingsMenu(e) {
       }
 
       function playBossFistGame() {
+        if (showSickLockNotice("玩遊戲")) return;
         if (showWorkLockNotice("玩遊戲")) return;
         resetIdleTimer();
         if (activeMiniGame) return showMiniGameBusyMessage();
-        if (dinoStats.coins < 15) {
-          showMiniGameMessage("⟨金幣不足 $15，無法挑戰主管！🥊⟩");
+        const entryFee = getMiniGamePrice("boss");
+        if (dinoStats.coins < entryFee) {
+          showMiniGameMessage("⟨金幣不足 $" + entryFee + "，無法挑戰主管！🥊⟩");
           return;
         }
-        dinoStats.coins -= 15;
+        dinoStats.coins -= entryFee;
         saveMiniGameCoins();
         bossFistRun = { round: 0, prize: 0 };
         activeMiniGame = "boss";
-        renderBossFistChoices("已扣除挑戰費 $15；贏了可領獎或繼續加倍，輸了本局獎金歸零。");
+        queueBossAuditForGame();
+        changeStress(4); logJournalActivity("開始玩主管猜拳，入場費 $" + entryFee);
+        renderBossFistChoices("已扣除挑戰費 $" + entryFee + "；贏了可領獎或繼續加倍，輸了本局獎金歸零。");
       }
 
       function renderBossFistChoices(note) {
@@ -3116,20 +3731,25 @@ function toggleSettingsMenu(e) {
         else bossFistRun = null;
         activeMiniGame = null;
         saveMiniGameCoins();
+        logJournalActivity("遊戲領取獎金 $" + run.prize);
         showMiniGameMessage('💰 已領取 $' + run.prize + '，獎金入帳！');
       }
 
       function playGashapon() {
+        if (showSickLockNotice("玩遊戲")) return;
         if (showWorkLockNotice("玩遊戲")) return;
         resetIdleTimer();
         if (activeMiniGame) return showMiniGameBusyMessage();
-        if (dinoStats.coins < 15) {
-          showMiniGameMessage("⟨金幣不足 $15，轉蛋機轉不動啦！🎰⟩");
+        const entryFee = getMiniGamePrice("gacha");
+        if (dinoStats.coins < entryFee) {
+          showMiniGameMessage("⟨金幣不足 $" + entryFee + "，轉蛋機轉不動啦！🎰⟩");
           return;
         }
-        dinoStats.coins -= 15;
+        dinoStats.coins -= entryFee;
         saveMiniGameCoins();
         activeMiniGame = "gacha";
+        queueBossAuditForGame();
+        changeStress(4); logJournalActivity("開始摸魚轉蛋，花費 $" + entryFee);
         const symbols = ["💰", "🍙", "☕", "🍮", "🍜", "🍰", "📎", "❔"];
         showMiniGameMessage('<div class="flex flex-col items-center gap-1 w-full"><span class="font-bold text-amber-700">🎰 正在抽取神祕獎品…</span><div id="gachaReel" class="text-2xl">🎁</div></div>');
         gachaSpinTimer = setInterval(() => {
@@ -3248,23 +3868,50 @@ function toggleSettingsMenu(e) {
         ] },      ];
       let currentRandomEvent = null;
       let randomEventTimer = null;
+      let randomEventPromptTimer = null;
 
       function showRandomOfficeEvent() {
         if (isSleeping || activeMiniGame || currentRandomEvent || dinoStats.hunger <= 0 || dinoStats.thirst <= 0 || dinoStats.mood <= 0) return false;
-        const speech = document.getElementById("dinoSpeech");
-        if (!speech || speech.querySelector("button, input, select, textarea")) return false;
         currentRandomEvent = randomOfficeEvents[Math.floor(Math.random() * randomOfficeEvents.length)];
-        document.getElementById("randomEventTitle").innerText = currentRandomEvent.title;
-        document.getElementById("randomEventStory").innerText = currentRandomEvent.story;
-        document.getElementById("randomEventChoices").innerHTML = currentRandomEvent.choices.map((choice, index) =>
-          '<button type="button" onclick="resolveRandomOfficeEvent(' + index + ')" class="rounded-lg border border-[#EAE6DF] bg-[#F7F5EF] px-2 py-2 text-left text-[10px] font-bold text-[#5C5247] hover:bg-[#EEF2E9]">' + choice.label + '</button>'
-        ).join("");
-        const overlay = document.getElementById("randomEventOverlay");
-        overlay.classList.remove("hidden");
-        overlay.classList.add("flex");
+        updateRandomEventNotice();
+        logJournalActivity("遇到突發事件：" + currentRandomEvent.title);
+        openPendingOfficeEvent();
         return true;
       }
-
+      function showBossAudit(context, baseFineRate = 0.2) {
+        if (currentRandomEvent) {
+          queuedBossAudit = { context, baseFineRate };
+          return false;
+        }
+        const workAudit = context === "work";
+        const fineRate = Math.random() < 0.05 ? 0.5 : Math.min(0.3, baseFineRate);
+        currentRandomEvent = {
+          isAudit: true,
+          title: "🦖 暴龍主管突然巡視",
+          story: workAudit
+            ? "主管突然走到你的座位旁，要求立刻查看工作進度！"
+            : "主管突然出現在地下遊藝附近，注意到了這裡的動靜！",
+          choices: [
+            { label: workAudit ? "趕快打開工作進度" : "趕快收起遊戲，假裝在忙", outcomes: [
+              { text: "主管看了一眼就離開了，這次安全過關。", stats: { mood: 3 } },
+              { text: "主管看見你剛才在摸魚，開立違規罰單！", auditFineRate: fineRate },
+            ] },
+            { label: "老實承認，請主管從輕處理", outcomes: [
+              { text: "主管念了幾句，仍開立一張較輕的罰單。", auditFineRate: Math.min(fineRate, 0.2) },
+            ] },
+          ],
+        };
+        updateRandomEventNotice();
+        logJournalActivity("暴龍主管突擊稽查（" + (workAudit ? "打工" : "地下遊藝") + "）");
+        openPendingOfficeEvent();
+        return true;
+      }
+      function showQueuedBossAudit() {
+        if (!queuedBossAudit || currentRandomEvent || activeMiniGame) return;
+        const audit = queuedBossAudit;
+        queuedBossAudit = null;
+        showBossAudit(audit.context, audit.baseFineRate);
+      }
       function scheduleRandomOfficeEvent(delay) {
         clearTimeout(randomEventTimer);
         randomEventTimer = setTimeout(() => {
@@ -3279,41 +3926,67 @@ function toggleSettingsMenu(e) {
         const choice = event.choices[choiceIndex];
         if (!choice) return;
         currentRandomEvent = null;
+        clearTimeout(randomEventPromptTimer);
+        randomEventPromptTimer = null;
         const overlay = document.getElementById("randomEventOverlay");
         overlay.classList.add("hidden");
         overlay.classList.remove("flex");
+        updateRandomEventNotice();
 
         const outcome = choice.outcomes[Math.floor(Math.random() * choice.outcomes.length)];
         const details = [outcome.text];
+        const displayEffects = [];
         if (outcome.coins) {
           const delta = Array.isArray(outcome.coins)
             ? Math.floor(Math.random() * (outcome.coins[1] - outcome.coins[0] + 1)) + outcome.coins[0]
             : outcome.coins;
           const actualDelta = delta < 0 ? -Math.min(dinoStats.coins, Math.abs(delta)) : delta;
           dinoStats.coins = Math.max(0, dinoStats.coins + actualDelta);
-          details.push((actualDelta >= 0 ? '💰 金幣 +' : '💸 金幣 ') + (actualDelta >= 0 ? '$' + actualDelta : '-$' + Math.abs(actualDelta)));
+          const moneyText = (actualDelta >= 0 ? '💰 金幣 +' : '💸 金幣 ') + (actualDelta >= 0 ? '$' + actualDelta : '-$' + Math.abs(actualDelta));
+          details.push(moneyText);
+          displayEffects.push(moneyText);
+          if (actualDelta < 0) changeStress(3);
+          saveMiniGameCoins();
+        }
+        if (outcome.auditFineRate !== undefined) {
+          const fineRate = Math.max(0, Math.min(0.5, Number(outcome.auditFineRate) || 0));
+          const fine = Math.min(dinoStats.coins, Math.ceil(dinoStats.coins * fineRate));
+          dinoStats.coins = Math.max(0, dinoStats.coins - fine);
+          const fineText = "💸 罰款 " + (fineRate * 100) + "%，扣除 $" + fine;
+          details.push(fineText);
+          displayEffects.push(fineText);
+          if (fine > 0) changeStress(3);
           saveMiniGameCoins();
         }
         if (outcome.stats) {
           Object.entries(outcome.stats).forEach(([key, delta]) => {
             if (Object.prototype.hasOwnProperty.call(dinoStats, key) && key !== "coins" && key !== "bag") {
               dinoStats[key] = Math.max(0, Math.min(100, dinoStats[key] + delta));
-              details.push(({ hunger: "🍗 飢餓", thirst: "☕ 口渴", mood: "✨ 心情" })[key] + (delta >= 0 ? ' +' : ' ') + delta + '%');
+              const statText = ({ hunger: "🍗 飢餓", thirst: "☕ 口渴", mood: "✨ 心情", stress: "💼 壓力" })[key] + (delta >= 0 ? ' +' : ' ') + delta + '%';
+              details.push(statText);
+              displayEffects.push(statText);
               localStorage.setItem("dino_" + key, String(dinoStats[key]));
             }
           });
           updateStatsUI();
+          if (Object.values(outcome.stats).some((value) => value < 0)) changeStress(2);
         }
         if (outcome.food) {
           const food = grantRandomMarketFood();
-          if (food) details.push('🎁 獲得 ' + food.emoji + food.name + ' ×1');
-          else { dinoStats.coins += 5; details.push('🎒 食物背包已滿，改得 $5'); saveMiniGameCoins(); }
+          if (food) { const foodText = '🎁 獲得 ' + food.emoji + food.name + ' ×1'; details.push(foodText); displayEffects.push(foodText); }
+          else { dinoStats.coins += 5; const fullBagText = '🎒 食物背包已滿，改得 $5'; details.push(fullBagText); displayEffects.push(fullBagText); saveMiniGameCoins(); }
         }
         if (outcome.item) {
-          details.push(awardRandomEventCollectionItem(outcome.item));
+          const itemText = awardRandomEventCollectionItem(outcome.item);
+          details.push(itemText);
+          displayEffects.push(itemText);
         }
-        showMiniGameMessage('<div class="flex flex-col gap-1 w-full"><span class="font-bold text-amber-700">' + event.title + '</span><span class="text-[10px] text-[#5C5247]">' + details.join('　') + '</span></div>');
+        const resultLine = '事件「' + event.title + '」結果：' + details.join('、');
+        logJournalActivity(resultLine);
+        const effectHtml = displayEffects.length ? '<div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-[#EAE6DF] pt-1 text-[9px] font-bold text-[#5C5247]">' + displayEffects.map((text) => '<span class="whitespace-nowrap">' + text + '</span>').join('') + '</div>' : '';
+        showMiniGameMessage('<div class="flex flex-col gap-1 w-full"><span class="font-bold text-amber-700">' + event.title + '</span><span class="text-[10px] leading-snug text-[#5C5247]">' + outcome.text + '</span>' + effectHtml + '</div>');
         scheduleRandomOfficeEvent(120000 + Math.random() * 150000);
+        setTimeout(showQueuedBossAudit, 350);
       }
 
       function awardRandomEventCollectionItem(itemId) {
