@@ -11,7 +11,7 @@
       src="dino_data.txt"
       onerror="console.log('尚未生成備份檔，將使用預設暫存')"
     ></script>
-    <!-- 引入 Google Fonts (韓系字型) -->
+    <!-- 引入 Google Fonts  -->
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
       rel="stylesheet"
@@ -365,23 +365,38 @@
       <div
         class="flex justify-between items-center text-[10px] font-bold text-[#8C7E70] w-full"
       >
-        <div class="flex items-center gap-2">
-          <span class="flex items-center gap-1.5"
+      <div
+        class="flex justify-between items-center text-[10px] font-bold text-[#8C7E70] w-full gap-1 overflow-hidden"
+      >
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="flex items-center gap-1 shrink-0"
             ><i class="fa-solid fa-shield-cat text-[#94A684]"></i>
-            辦公室小恐龍</span
+            小恐龍</span
           >
           <span
-            class="bg-[#F5F2EB] px-2 py-0.5 rounded-full text-[9px] text-[#7C7063] font-bold border border-[#EAE6DF]"
+            class="bg-[#F5F2EB] px-1.5 py-0.5 rounded-full text-[9px] text-[#7C7063] font-bold border border-[#EAE6DF] shrink-0"
           >
             💰 <span id="coinCount">0</span>
           </span>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="randomEventNotice" type="button" onclick="openPendingOfficeEvent()" title="有突發事件待處理，點擊查看" aria-label="有突發事件待處理，點擊查看" aria-live="polite" class="hidden rounded-full bg-amber-100 px-2 py-1 text-[9px] font-bold text-amber-900">⚠️ 待處理</button>
-          <span id="dinoTitle" class="text-[9px] text-[#A39E93] font-normal"
+        
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button id="randomEventNotice" type="button" onclick="openPendingOfficeEvent()" title="有突發事件待處理，點擊查看" aria-label="有突發事件待處理，點擊查看" aria-live="polite" class="hidden rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold text-amber-900 animate-pulse">⚠️ 待處理</button>
+          
+          <span id="dinoTitle" class="text-[9px] text-[#A39E93] font-normal truncate max-w-[110px] pl-1.5 border-l border-[#EAE6DF] pr-2"
             >狀態：正常運轉</span
           >
-          </div>
+        </div>
+      </div>
+		  
+		  <!-- ❓ 遊戲說明按鈕 -->
+          <button
+			onclick="openHelpModal()"
+			class="h-6 px-2 rounded-md bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] hover:text-[#4A3F35] transition flex items-center gap-1 font-bold cursor-pointer"
+			title="遊戲新手說明書"
+		  >
+			<i class="fa-solid fa-circle-question text-[10px] text-amber-600"></i>
+		  </button>
       </div>
 
       <div id="dinoExpandedBody" class="flex flex-col gap-2.5">
@@ -1634,6 +1649,36 @@
 			</div>
 		</div>
 		</div>
+		
+	<!-- 📖 手遊級遊戲說明書彈窗 (精美標籤頁切換設計) -->
+    <div id="helpModal" class="hidden fixed inset-0 z-[100000] items-center justify-center bg-[#342e28]/50 p-3" onclick="if(event.target===this)closeHelpModal()">
+      <div class="w-full max-w-[440px] h-[82vh] max-h-[460px] rounded-2xl border border-[#EAE6DF] bg-[#FFFDF9] p-4 shadow-2xl flex flex-col gap-3 relative" onclick="event.stopPropagation()">
+        
+        <!-- 頂部標題與關閉按鈕 -->
+        <div class="flex items-center justify-between border-b border-[#EAE6DF] pb-2 shrink-0">
+          <span class="font-bold text-[13px] text-[#4A3F35]">📖 辦公室小恐龍・新手指南與使用說明</span>
+          <button type="button" onclick="closeHelpModal()" class="rounded-lg bg-[#F5F2EB] hover:bg-[#EAE6DF] px-2.5 py-1 text-[10px] font-bold text-[#7C7063] cursor-pointer">關閉</button>
+        </div>
+
+        <!-- 標籤頁導航列 (一格一格、選中會凸出的方塊標籤) -->
+        <div class="grid grid-cols-3 gap-1.5 shrink-0">
+          <button type="button" onclick="switchHelpTab('stats')" id="helpTab_stats" class="py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#94A684] text-white shadow-xs">🦖 養成狀態</button>
+          <button type="button" onclick="switchHelpTab('work')" id="helpTab_work" class="py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] border border-[#EAE6DF]">💼 打工日常</button>
+          <button type="button" onclick="switchHelpTab('market')" id="helpTab_market" class="py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] border border-[#EAE6DF]">🎰 遊藝轉蛋</button>
+          <button type="button" onclick="switchHelpTab('stock')" id="helpTab_stock" class="py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] border border-[#EAE6DF]">📈 股市投資</button>
+          <button type="button" onclick="switchHelpTab('collection')" id="helpTab_collection" class="py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] border border-[#EAE6DF]">📚 圖鑑煉金</button>
+          <button type="button" onclick="switchHelpTab('crisis')" id="helpTab_crisis" class="py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] border border-[#EAE6DF]">🚨 危機生存</button>
+        </div>
+
+        <!-- 右側/下方內容說明大容器 (空間超大、閱讀超舒服) -->
+        <div class="flex-1 bg-stone-50/50 p-3 rounded-xl border border-[#EAE6DF] overflow-y-auto pr-2 text-[10px] text-[#5C5247] leading-relaxed space-y-2">
+          <div id="helpContentContainer">
+            <!-- 動態載入說明內容 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
 	  
     <!-- 💡 JavaScript 邏輯 -->
     <script>
@@ -1651,10 +1696,10 @@
         energyDrink: { emoji: "⚡", name: "能量飲料", price: 25, effects: { thirst: 40, mood: 15, hunger: -5 } },
       };
       const savedBag = JSON.parse(localStorage.getItem("dino_bag") || "null") || {};
-      const defaultBag = { chicken: 1, sprite: 1, beer: 0, salad: 0 };
+      const defaultBag = { chicken: 0, sprite: 0, beer: 0, salad: 0 };
       const loadSavedPercent = (key) => {
         const saved = localStorage.getItem(key);
-        if (saved === null) return 80;
+        if (saved === null) return 100; // 💡 沒存過檔案時，預設給 100 滿狀態！
         return Math.max(0, Math.min(100, Number(saved) || 0));
       };
       let dinoStats = {
@@ -1662,7 +1707,8 @@
         thirst: loadSavedPercent("dino_thirst"),
         mood: loadSavedPercent("dino_mood"),
         stress: Math.max(0, Math.min(100, Number(localStorage.getItem("dino_stress")) || 0)),
-        coins: parseInt(localStorage.getItem("dino_coins")) || 0,
+        // 💡 如果 localStorage 裡沒有存過金幣（代表是全新玩家），預設給 $50
+		coins: localStorage.getItem("dino_coins") !== null ? parseInt(localStorage.getItem("dino_coins")) : 50,
         bag: Object.fromEntries(Object.keys(foodCatalog).map((key) => [key, savedBag[key] ?? defaultBag[key] ?? 0])),
       };
       let journalData = {};
@@ -3868,14 +3914,31 @@ document.getElementById("hungerBar").style.width =
         }
         const amount = rawAmount;
         const stock = stockMarket[type];
-        const subtotal = stock.price * amount;
-        const fee = Math.ceil(subtotal * stockFeeRates.buy);
-        const cost = subtotal + fee;
-        if (dinoStats.coins < cost) {
-          stockActionNotice = `金幣不足：買進 ${amount} 張需 $${cost}（含手續費 $${fee}）`;
+
+        // 🚨 限制每種股票總持股上限為 100 張！
+        const maxHoldingLimit = 100;
+        if (stock.holding + amount > maxHoldingLimit) {
+          stockActionNotice = `每種股票最多只能持有 ${maxHoldingLimit} 張！`;
           updateStockUI();
           return;
         }
+
+        // 💡 智慧大戶稅：如果單次買超過 20 張，或者買完後持股超過 50 張，手續費加重為 10%（原本 5%）
+        let currentBuyFeeRate = stockFeeRates.buy; // 預設 0.05 (5%)
+        if (amount >= 20 || (stock.holding + amount) > 50) {
+          currentBuyFeeRate = 0.10; // 10% 大戶稅
+        }
+
+        const subtotal = stock.price * amount;
+        const fee = Math.ceil(subtotal * currentBuyFeeRate);
+        const cost = subtotal + fee;
+
+        if (dinoStats.coins < cost) {
+          stockActionNotice = `金幣不足：買進 ${amount} 張需 $${cost}（含大戶手續費 $${fee}）`;
+          updateStockUI();
+          return;
+        }
+
         if (!Object.values(stockMarket).some((item) => item.holding > 0)) {
           stockHoldingFeeElapsedMs = 0;
           stockHoldingFeeRemainder = 0;
@@ -3883,6 +3946,7 @@ document.getElementById("hungerBar").style.width =
           localStorage.setItem("stock_holding_fee_elapsed_ms", "0");
           localStorage.setItem("stock_holding_fee_remainder", "0");
         }
+
         dinoStats.coins -= cost;
         stock.holding += amount;
         stock.totalCost += cost;
@@ -3890,8 +3954,11 @@ document.getElementById("hungerBar").style.width =
         localStorage.setItem(`stock_${type}_holding`, stock.holding);
         localStorage.setItem(`stock_${type}_cost`, stock.totalCost);
         document.getElementById("coinCount").innerText = dinoStats.coins;
-        stockActionNotice = `✅ 買進 ${amount} 張，成交 $${subtotal}，手續費 $${fee}`;
-        logJournalActivity("買進「" + stockMeta[type].name + "」" + amount + " 張，花費 $" + cost);
+
+        const feeLabel = currentBuyFeeRate > 0.05 ? " (含大戶稅10%)" : "";
+        stockActionNotice = `✅ 買進 ${amount} 張，成交 $${subtotal}，手續費 $${fee}${feeLabel}`;
+        logJournalActivity("買進「" + stockMeta[type].name + "」" + amount + " 張，花費 $" + cost + feeLabel);
+        
         stockTradeCompleted = true;
         updateStockUI();
         clearTimeout(stockActionTimer);
@@ -4614,7 +4681,9 @@ document.getElementById("hungerBar").style.width =
 				// 3. 回傳帶有隨機金額的完美對話框文字！
 				return `「阿姨水餃真飽滿！裡面包著寫著『老闆今天心情不好』的小紙條，意外掉出了 $${bonus} 元銅板 🥟✨」`;
 		   })(),
-		    pizza: (Math.random() < 0.2) ? "「嘶……隔夜披薩果然有風險！肚子突然一陣劇痛，心情變差了 🍕💥」" : "「冷掉的披薩別有一番風味！完美大滿足 🍕✨」"
+		   coldPizza: (Math.random() < 0.2) 
+            ? "「嘶……隔夜披薩果然有風險！肚子突然一陣劇痛，心情變差了 🍕💥」" 
+            : "「冷掉的披薩別有一番風味！完美大滿足 🍕✨」"
           };
           dinoReaction = snackReactions[type];
         } else {
@@ -7419,7 +7488,110 @@ document.getElementById("hungerBar").style.width =
 	  }
 	  }, 1000);
 	  
-	    // ==================== 放在這裡最適合 ====================
+	  // ==================== 📖 遊戲說明書彈窗邏輯 ====================
+	  function openHelpModal() {
+	  if (typeof resetIdleTimer === "function") resetIdleTimer();
+	  const modal = document.getElementById("helpModal");
+	  if (modal) {
+	  	modal.classList.remove("hidden");
+	  	modal.classList.add("flex");
+	  	switchHelpTab('stats'); // 預設打開第一個分頁
+	  }
+	  }
+	  
+	  function closeHelpModal() {
+	  const modal = document.getElementById("helpModal");
+	  if (modal) {
+	  	modal.classList.add("hidden");
+	  	modal.classList.remove("flex");
+	  }
+	  }
+	  
+	  function switchHelpTab(tabName) {
+	  // 1. 切換上方標籤頁按鈕樣式 (選中的標籤凸顯，未選中的變灰)
+	  ['stats', 'work', 'market', 'stock', 'collection', 'crisis'].forEach(t => {
+	  	const btn = document.getElementById(`helpTab_${t}`);
+	  	if (!btn) return;
+	  	if (t === tabName) {
+	  	btn.className = "py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#94A684] text-white shadow-sm scale-[1.02]";
+	  	} else {
+	  	btn.className = "py-1.5 px-2 rounded-xl text-[10px] font-bold transition cursor-pointer text-center bg-[#F5F2EB] hover:bg-[#EAE6DF] text-[#7C7063] border border-[#EAE6DF]";
+	  	}
+	  });
+	  
+	  // 2. 切換右側詳細說明文字 (修復所有符號)
+	  const contentArea = document.getElementById("helpContentContainer");
+	  if (!contentArea) return;
+	  
+	  const contents = {
+	  	stats: `
+		<b class="text-[#4A3F35] block text-[11px] mb-1">🦖 恐龍養成與狀態指南</b>
+		<p class="mb-2">小恐龍有四項核心數值（飢餓、口渴、心情、壓力），會隨著時間每分鐘下降 2%。</p>
+		<ul class="list-disc pl-3 space-y-1">
+			<li><b>數值歸零</b>：飢餓或口渴歸零持續 5 分鐘後會進入<b>「病假狀態」</b>（無法打工與玩遊戲），需到商場購買特效藥 $300 或特休假單 $500 治療。</li>
+			<li><b>壓力過高</b>：壓力 ≥ 80% 時打工收入會減少 20%；壓力 ≥ 100% 會過勞，需休息 30 秒。</li>
+			<li><b>免費恢復</b>：透過摸摸頭、抱抱、揮拳發洩或帶薪大便（間隔1分鐘可降壓20%）來維持好狀態。</li>
+			<li><b>辦公椅老化</b>：每次打工或玩遊戲會消耗 1 次椅椅耐久（上限20次）。歸零後心情每秒狂掉 1%，需花費 $50 修理。</li>
+		</ul>
+		<div class="mt-2.5 p-2 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 font-bold">
+			💡 <b>生存保命小撇步</b>：本遊戲關閉分頁或程式時數值會暫停消耗！但請記得定期點擊右下角設定裡的<b>「備份數據」</b>匯出存檔，避免瀏覽器快取被清掉時心血白費喔！
+		</div>
+		`,
+	  	work: `
+	  	<b class="text-[#4A3F35] block text-[11px] mb-1">💼 打工與生活日常</b>
+	  	<p class="mb-2">派打工是賺取金幣的主要來源，時長從 1 分鐘到 60 分鐘不等。</p>
+	  	<ul class="list-disc pl-3 space-y-1">
+	  		<li><b>工作零食</b>：打工結束時有 30% 機率獲得隨機特別小零食。</li>
+	  		<li><b>每日簽到</b>：每天可簽到一次，隨機獲得金幣或豐富食物。</li>
+	  		<li><b>打工鎖定</b>：打工進行中時，為了避免作弊，部分操作會暫時鎖定。</li>
+	  	</ul>
+	  	`,
+	  	market: `
+	  	<b class="text-[#4A3F35] block text-[11px] mb-1">🎰 地下遊藝與摸魚轉蛋</b>
+	  	<p class="mb-2">上班壓力大？來地下遊藝場摸魚試手氣！</p>
+	  	<ul class="list-disc pl-3 space-y-1">
+	  		<li><b>常規機台</b>：硬幣連莊、珍奶拉霸、主管猜拳，偷喝特調，低調摸魚，贏了可挑戰連續加倍！</li>
+	  		<li><b>摸魚轉蛋機</b>：每日限轉 10 次。有機率抽中金幣、食物，或 50 款珍貴的辦公室藏品！</li>
+	  		<li><b>傳奇解鎖機台</b>：
+	  		<br>・<b>🧧 年終刮刮樂</b>：收集任意 1 張 SSR 後解鎖 (每日3張)。
+	  		<br>・<b>🐎 辦公室賽馬場</b>：收集任意 2 張 SSR 後解鎖 (每日3場)。
+	  		<br>・<b>🎯 急件退散(打地鼠)</b>：集齊全部 3 張 SSR 後解鎖 (每日3次)。</li>
+	  	</ul>
+	  	`,
+	  	stock: `
+	  	<b class="text-[#4A3F35] block text-[11px] mb-1">📈 股市投資指南</b>
+	  	<p class="mb-2">辦公室地下炒股，低買高賣賺大錢！</p>
+	  	<ul class="list-disc pl-3 space-y-1">
+	  		<li><b>手續費</b>：買進收 5%，賣出收 3%。</li>
+	  		<li><b>大戶稅防呆</b>：單次買進 ≥ 20 張，或買完後總持股超過 50 張，買進手續費會加重為 <b>10%</b>！</li>
+	  		<li><b>持股上限</b>：每種股票最多只能持有 <b>100 張</b>，防止無腦刷錢。</li>
+	  		<li><b>持有費</b>：每小時扣除總市值 1% 的持有費（只計程式開啟時間）。</li>
+	  	</ul>
+	  	`,
+	  	collection: `
+	  	<b class="text-[#4A3F35] block text-[11px] mb-1">📚 圖鑑、煉金與天賦技能</b>
+	  	<p class="mb-2">收集控與大神的畢業之路！</p>
+	  	<ul class="list-disc pl-3 space-y-1">
+	  		<li><b>同卡突破升星</b>：重複獲得藏品累積數量，可消耗升至 ★2 (送1 SP) 與 ★3 滿星 (送3 SP)。滿星藏品會提供被動打工加成與每分鐘自動產金幣！</li>
+	  		<li><b>廢文煉金爐</b>：N卡 ➔ R卡 ➔ SR卡 ➔ SSR卡，自由分配投入數量並支付手續費進行融合！</li>
+	  		<li><b>SP 技能樹與黑市</b>：消耗升星獲得的 SP 點數升級 6 大技能，或到地下黑市兌換現金、下午茶與 3 倍打工超頻 Buff！</li>
+	  	</ul>
+	  	`,
+	  	crisis: `
+	  	<b class="text-[#4A3F35] block text-[11px] mb-1">🚨 危機與生存防範指南</b>
+	  	<p class="mb-2">小心！當你存款愈來愈多，公司高層和黑心福委會就會盯上你！</p>
+	  	<ul class="list-disc pl-3 space-y-1">
+	  		<li><b>第一階段 ($5,000)</b>：福委會突襲，強制盲抽贊助下午茶經費。</li>
+	  		<li><b>第二階段 ($10,000)</b>：無預警裁員風波，需花錢賄賂人資或使用通行證保命。</li>
+	  		<li><b>第三階段 ($25,000)</b>：董事會惡意併購，面臨高額忠誠企業稅或法務訴訟。</li>
+	  		<li><b>暴龍主管突擊</b>：打工或玩遊戲時隨機觸發稽查，沒回答好會吃罰單！</li>
+	  	</ul>
+	  	`
+	  };
+	  
+	  contentArea.innerHTML = contents[tabName] || "請選擇上方分頁查看說明。";
+	  }
+	  
 	  // 背景計時器：每秒更新黑市超頻按鈕的倒數狀態
 	  setInterval(() => {
 	  	const btn = document.getElementById("marketBuffBtn");
@@ -7445,6 +7617,10 @@ document.getElementById("hungerBar").style.width =
       window.closeAlchemyModal = closeAlchemyModal;
       window.executeAlchemy = executeAlchemy;
       window.executeStarUp = executeStarUp;
+      // 🌟 在這裡合體加入說明書的掛載！
+      window.openHelpModal = openHelpModal;
+      window.closeHelpModal = closeHelpModal;
+      window.switchHelpTab = switchHelpTab;
 	  
     </script>
   </body>
